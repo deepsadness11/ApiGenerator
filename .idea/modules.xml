@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/ApiServiceGn.iml" filepath="$PROJECT_DIR$/.idea/modules/ApiServiceGn.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/ApiServiceGn_main.iml" filepath="$PROJECT_DIR$/.idea/modules/ApiServiceGn_main.iml" group="ApiServiceGn" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/ApiServiceGn_test.iml" filepath="$PROJECT_DIR$/.idea/modules/ApiServiceGn_test.iml" group="ApiServiceGn" />
+    </modules>
+  </component>
+</project>

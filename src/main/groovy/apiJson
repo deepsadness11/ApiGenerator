@@ -1,0 +1,507 @@
+{ "api": [
+  {
+    "type": "get",
+    "url": "/clubs/:club_id/contents?offset=*limit=*",
+    "title": "获取指定圈子内阅读日记动态",
+    "name": "get_clubs__club_id_contents",
+    "group": "content",
+    "version": "1.0.0",
+    "permission": [
+      {
+        "name": "token",
+        "title": "需要用户登录",
+        "description": "<p>需要在header中传递Authorization，详情参考“使用前必读”-“公共参数”</p>"
+      }
+    ],
+    "description": "<p>获取指定圈子内阅读日记动态</p>",
+    "parameter": {
+      "fields": {
+        "Parameter": [
+          {
+            "group": "Parameter",
+            "type": "Integer",
+            "optional": false,
+            "field": "club_id",
+            "description": "<p>圈子id</p>"
+          },
+          {
+            "group": "Parameter",
+            "type": "Integer",
+            "optional": false,
+            "field": "offset",
+            "description": "<p>请求的起始索引，默认0</p>"
+          },
+          {
+            "group": "Parameter",
+            "type": "Integer",
+            "optional": true,
+            "field": "limit",
+            "defaultValue": "10",
+            "description": "<p>请求的数据条数，默认10条</p>"
+          }
+        ]
+      }
+    },
+    "success": {
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "next",
+            "description": "<p>下一次请求的offset</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Object[]",
+            "optional": false,
+            "field": "items",
+            "description": "<p>日记的数组</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "items.content_id",
+            "description": "<p>日记id</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "items.title",
+            "description": "<p>日记标题，可空</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "items.content_type",
+            "description": "<p>日记类型，1代表图片，2代表视频，3代表音频，4代表图文，5代表说说</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "items.summary",
+            "description": "<p>摘要</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "items.create_at_format",
+            "description": "<p>格式化后的发表时间，格式 HH:mm:ss</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "items.is_open",
+            "description": "<p>是否阅读圈可见，1可见，0不可见</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "items.is_html",
+            "description": "<p>是否为HTML日记，0不是，1是</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "items.audio_url",
+            "description": "<p>音频日记的URL</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Object",
+            "optional": false,
+            "field": "items.video",
+            "description": "<p>视频日记实体</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "items.video.cover",
+            "description": "<p>视频的播放coverURL</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "items.video.width",
+            "description": "<p>视频的宽</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "items.video.height",
+            "description": "<p>视频的高</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "items.video.url_f10",
+            "description": "<p>视频的标清播放地址</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "items.video.url_f20",
+            "description": "<p>视频的高清播放地址</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "items.video.url_f30",
+            "description": "<p>视频的超清播放地址，阿里云视频默认使用f30</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "items.duration_format",
+            "description": "<p>视频或音频的格式化时长</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Object[]",
+            "optional": false,
+            "field": "items.images",
+            "description": "<p>日记的图片数组，可空</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "items.images.url",
+            "description": "<p>图片的大图地址，querystring上有图片的宽和高</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "items.images.thumb_url",
+            "description": "<p>图片的缩略图地址，querystring上有图片的宽和高</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Object",
+            "optional": false,
+            "field": "items.binded_goods",
+            "description": "<p>绑定的相关图书，可为空</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "items.binded_goods.goods_id",
+            "description": "<p>商品的id</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "items.binded_goods.goods_name",
+            "description": "<p>商品的名称</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "items.binded_goods.goods_thumb",
+            "description": "<p>商品的cover</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "items.binded_goods.shop_url",
+            "description": "<p>商品在童书馆的URL</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Object",
+            "optional": false,
+            "field": "items.topic",
+            "description": "<p>日记对应的话题，可为空</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "items.topic.topic_id",
+            "description": "<p>话题的id</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "items.topic.content",
+            "description": "<p>话题的日记，以两个#包含</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "items.topic.type",
+            "description": "<p>话题类型，默认0，1活动类（即点击进入活动详情页），2课程类（即点击进入课程详情）</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "items.topic.type_id",
+            "description": "<p>话题类型对应的id，比如活动时，为具体活动的id</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "items.like_count",
+            "description": "<p>喜欢数或者点赞数</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "items.like_status",
+            "description": "<p>喜欢状态，0为未喜欢（点赞），1已喜欢（点赞）</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Object",
+            "optional": false,
+            "field": "items.user",
+            "description": "<p>发布日记的用户信息</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "items.user.user_id",
+            "description": "<p>用户的id</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "items.user.user_name",
+            "description": "<p>用户名</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "items.user.avatar",
+            "description": "<p>用户头像URL</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "items.user.is_lecturer",
+            "description": "<p>是否讲师，0不是，1是</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "items.user.is_promoter",
+            "description": "<p>是否是推广人，0不是，1是</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "items.user.friend_status",
+            "description": "<p>关注状态，0双方都未关注对方；1当前用户关注了对方，对方没有关注当前用户；2当前用户没有关注对方，对方关注了当前用户；3双方互相关注。</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Object",
+            "optional": false,
+            "field": "items.baby",
+            "description": "<p>日记绑定的宝宝信息</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "items.baby.baby_id",
+            "description": "<p>宝宝id</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "items.baby.name",
+            "description": "<p>宝宝名称</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "items.baby.age_desc",
+            "description": "<p>宝宝年龄描述</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "items.baby.gender",
+            "description": "<p>宝宝性别，1男2女</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "items.comments_count",
+            "description": "<p>评论回复数</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Object[]",
+            "optional": false,
+            "field": "items.comments",
+            "description": "<p>最近的评论列表，最多返回3条</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "items.comments.comment_id",
+            "description": "<p>评论或回复的id</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": true,
+            "field": "items.comments.content",
+            "description": "<p>评论或回复的日记，语音评论时为空</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": true,
+            "field": "items.comments.audio_url",
+            "description": "<p>语音评论时的音频URL</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": true,
+            "field": "items.comments.audio_duration_format",
+            "description": "<p>语音评论时，音频的时长，HH:mm:ss</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "items.comments.create_at_format",
+            "description": "<p>格式化后的评论或回复的时间</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "items.comments.user_id",
+            "description": "<p>评论用户的id</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "items.comments.user_name",
+            "description": "<p>评论用户的用户名</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "items.comments.user_avatar",
+            "description": "<p>评论用户的头像</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "items.comments.to_user_id",
+            "description": "<p>评论被回复的用户id</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "items.comments.to_user_name",
+            "description": "<p>评论被回复的用户名</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "items.comments.to_user_avatar",
+            "description": "<p>评论被回复的用户头像</p>"
+          }
+        ]
+      },
+      "examples": [
+        {
+          "title": "正确响应",
+          "content": "HTTP/1.1 200 Ok\n   {\n      \"next\": 11,\n      \"items\": [\n          {\n              \"content_id\": 2,\n              \"title\": \"\",\n              \"content_type\": 1,\n              \"summary\": \"\",\n              \"create_at_format\": \"\",\n              \"is_open\": 1,\n              \"is_html\": 0,\n               \"audio_url\": \"\",\n               \"video\": {\n                  \"cover\": \"\",\n                  \"width\": 1920,\n                  \"height\": 1080,\n                  \"url_f10\": \"\",\n                  \"url_f20\": \"\",\n                  \"url_f30\": \"\",\n              },\n              \"duration_format\": \"\",\n              \"images\": [\n                  {\n                      \"url\": \"\",\n                      \"thumb_url\": \"\"\n                  }\n              ],\n              \"binded_goods\": {\n                  \"goods_id\": 23,\n                  \"goods_name\": \"\",\n                  \"goods_thumb\": \"\",\n                  \"shop_url\": \"\",\n              },\n              \"topic\": {\n                  \"topic_id\":12,\n                  \"content\":\"\",\n                  \"type\":2,\n                  \"type_id\":23,\n              },\n              \"like_status\": 1,\n              \"like_count\": 23,\n              \"user\": {\n                  \"user_id\": 234,\n                  \"user_name\": \"username\",\n                  \"avatar\": \"url\",\n                  \"is_lecturer\":0,\n                  \"is_promoter\":1,\n                  \"frient_status\": 1\n              },\n              \"baby\": {\n                  \"baby_id\": 23,\n                  \"baby_name\": \"宝宝名称\",\n                  \"age_desc\": \"1岁\",\n                  \"gender\":1\n              },\n              \"comments_count\": 23,\n              \"latest_comments\": [\n                  {\n                      \"comment_id\":23,\n                      \"content\": \"\",\n                      \"audio_url\":\"\",\n                      \"audio_duration_format\":\"00:8:00\"\n                      \"create_at_format\": \"1小时前\",\n                      \"user_id\": 2,\n                      \"user_name\": \"\",\n                      \"user_avatar\": \"\",\n                      \"to_user_id\": 3,\n                      \"to_user_name\": \"\",\n                      \"to_user_avatar\": \"\",\n                  }\n              ],\n          }\n      ]\n  }",
+          "type": "json"
+        }
+      ]
+    },
+    "error": {
+      "fields": {
+        "404": [
+          {
+            "group": "404",
+            "optional": false,
+            "field": "NotFound",
+            "description": "<p>请求的资源不存在</p>"
+          }
+        ],
+        "错误 4xx": [
+          {
+            "group": "4xx",
+            "optional": false,
+            "field": "InvalidToken",
+            "description": "<p>未登录或授权过期，请登录</p>"
+          }
+        ]
+      },
+      "examples": [
+        {
+          "title": "NotFound:",
+          "content": "HTTP/1.1 404 Not Found\n{\n  \"code\": \"NotFound\",\n  \"message\": \"请求的资源不存在\"\n}",
+          "type": "json"
+        },
+        {
+          "title": "InvalidToken:",
+          "content": "HTTP/1.1 401 Unauthorized\n{\n  \"code\": \"InvalidToken\",\n  \"message\": \"未登录或授权过期，请登录\"\n}",
+          "type": "json"
+        }
+      ]
+    },
+    "sampleRequest": [
+      {
+        "url": "https://api.baobaobooks.net/readerclub/v1/clubs/2/contents?offset=0"
+      }
+    ],
+    "filename": "readerclub/v1/content.php",
+    "groupTitle": "阅读日记",
+    "groupDescription": "<p>日记内容相关,包括点赞、评论等</p>"
+  }
+
+
+] }
