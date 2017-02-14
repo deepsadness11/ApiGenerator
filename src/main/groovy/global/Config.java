@@ -5,8 +5,7 @@ package global;
  */
 public interface Config {
 
-    String API_DEV_URL = "http://apidev.baobaobooks.net/docs/readerclub/api_data.js?v=1487067289562";
-    String API_URL = "http://apidev.baobaobooks.net/docs/readerclub/api_data.js?v=1487067289562";
+
 
     String API_CACHE_FILE_NAME = "apiJson";
     /**
