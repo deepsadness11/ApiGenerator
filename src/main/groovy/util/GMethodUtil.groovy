@@ -3,10 +3,12 @@ package util
 import bean.ApiBean
 import bean.FieldParam
 import com.squareup.javapoet.AnnotationSpec
+import com.squareup.javapoet.CodeBlock
 import com.squareup.javapoet.MethodSpec
 import com.squareup.javapoet.ParameterSpec
 import com.squareup.javapoet.ParameterizedTypeName
 import com.squareup.javapoet.TypeName
+import global.Config
 import okhttp3.MultipartBody
 import retrofit2.http.Body
 import retrofit2.http.DELETE
@@ -25,15 +27,18 @@ import java.lang.reflect.Type
  */
 //判断请求的类型
 def addRequestParam(String type, String targetUrl, String methodName, List<FieldParam> paramList, MethodSpec.Builder mb) {
+    def c = ClassName.get(Config.PACKAGE_NAME.COMMON, "Common")
+    def pathCode = CodeBlock.builder().add('$T._BASE+\"' + "$targetUrl\"", c).build()
+
 
     switch (type) {
-        case 'get': mb.addAnnotation(AnnotationSpec.builder(GET.class).addMember('value', targetUrl).build())
+        case 'get': mb.addAnnotation(AnnotationSpec.builder(GET.class).addMember('value', pathCode).build())
             addGetAndDeleteParam(paramList, mb); break
-        case 'post': mb.addAnnotation(AnnotationSpec.builder(POST.class).addMember('value', targetUrl).build())
+        case 'post': mb.addAnnotation(AnnotationSpec.builder(POST.class).addMember('value',  pathCode).build())
             addPutAndPostParam(methodName, paramList, mb); break
-        case 'delete': mb.addAnnotation(AnnotationSpec.builder(DELETE.class).addMember('value', targetUrl).build())
+        case 'delete': mb.addAnnotation(AnnotationSpec.builder(DELETE.class).addMember('value', pathCode).build())
             addGetAndDeleteParam(paramList, mb); break
-        case 'put': mb.addAnnotation(AnnotationSpec.builder(PUT.class).addMember('value', targetUrl).build())
+        case 'put': mb.addAnnotation(AnnotationSpec.builder(PUT.class).addMember('value', pathCode).build())
             addPutAndPostParam(methodName, paramList, mb); break
         default:
             throw new RuntimeException('target method not support now!!')
@@ -83,7 +88,7 @@ def String generateMethodDoc(ApiBean op, MethodSpec.Builder method) {
  */
 private def addPutAndPostParam(String methodName, List<FieldParam> paramList, MethodSpec.Builder mb) {
     //1.先判断是否包含有binary类型的参数
-    if (null==paramList)
+    if (null == paramList)
         return
 
     def isMultiBody = false
@@ -150,6 +155,7 @@ private def generateRequestBodyParam(String methodName, List<FieldParam> fieldPa
     //生成对应的类
     //对应的类名。应该是方法名的
     //通过javaPoet生成对应的RequestParam
+
     String methodNameParamName = generateRequestBodyParamName(methodName)
 
     ClassName className = GPoetUtil.generateRequestParam(methodNameParamName, fieldParams)

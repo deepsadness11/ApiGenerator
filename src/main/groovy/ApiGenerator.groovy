@@ -6,7 +6,8 @@ import global.Config
 import util.GApiUtil
 import util.GMethodUtil
 import util.GPoetUtil
-import util.GUrlUtil;
+import util.GUrlUtil
+import util.circleParse;
 
 import javax.lang.model.element.Modifier
 
@@ -22,10 +23,11 @@ import javax.lang.model.element.Modifier
 def realApiResponseJson
 if (Config.FROM_NET) {
     //Api的地址
-    def address = Config.API_DEV_URL
+    def address = Config.API_DEV_URL_READ
     realApiResponseJson = GApiUtil.GET_API_JSON(address)
     //保存到本地
-    GApiUtil.GET_JSON2FILE(realApiResponseJson)
+
+//    GApiUtil.GET_JSON2FILE(realApiResponseJson)
 } else {
     //从离线缓存中获取
     realApiResponseJson = GApiUtil.GET_FILE2String()
@@ -50,14 +52,14 @@ TypeSpec.Builder totalClass;
 //--------------->>开始对单个工作
 //得到成功的返回
 def tempOpGroup
-
+def circleMechine = new circleParse()
 apiList.api.forEach {
     op ->
         //如果不相等
         if (op.group != tempOpGroup) {
             if (totalClass != null) {
                 //生成类
-                GPoetUtil.print2File(Config.FILE_PATH.SERVICE_PATH, Config.PACKAGE_NAME.SERVICE, totalClass.build())
+                GPoetUtil.print2File(Config.FILE_PATH.SERVICE, Config.PACKAGE_NAME.SERVICE, totalClass.build())
             }
             tempOpGroup = op.group
             String apiServiceName = "$tempOpGroup" + "ApiService"
@@ -69,7 +71,7 @@ apiList.api.forEach {
         operateOnEachApiBean(op, totalClass)
 }
 //循环结束也需要创建
-GPoetUtil.print2File(Config.FILE_PATH.SERVICE_PATH, Config.PACKAGE_NAME.SERVICE, totalClass.build())
+GPoetUtil.print2File(Config.FILE_PATH.SERVICE, Config.PACKAGE_NAME.SERVICE, totalClass.build())
 
 //先创建类。暂时不分部分。
 
@@ -111,6 +113,27 @@ def operateOnEachApiBean(ApiBean op, TypeSpec.Builder totalClass) {
 
     methodAdd.addRequestParam(type, targetUrl, methodName, totalParam, method)
 
+    if (op == null) {
+        println 'object is null'
+        return
+    }
+    if (op.success == null) {
+        println op
+        println 'object success is null'
+        return
+    }
+
+    if (op.success.examples == null) {
+        println op.success
+        println 'object success example is null'
+        return
+    }
+
+    if (op.success.examples[0] == null) {
+        println op.success.examples
+        println 'object success example list is null'
+        return
+    }
 //生成返回对象
     List<ClassName> responseClass = GPoetUtil.generateResponseClass(op.success.examples[0], responseName);
 
@@ -126,3 +149,6 @@ def operateOnEachApiBean(ApiBean op, TypeSpec.Builder totalClass) {
 ------>>完成对应的方法
  */
 }
+
+//获取项目的配置文件
+

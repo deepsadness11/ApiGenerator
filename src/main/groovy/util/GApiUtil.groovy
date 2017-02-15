@@ -18,6 +18,7 @@ static String GET_API(String address) {
 //将网址转成想要的String
 static String GET_API_JSON(String address) {
     def apiString = GET_API(address)
+    new File(Config.API_CACHE_FILE_NAME).write(apiString)
     GET_API_JSON2Real(apiString)
 }
 
