@@ -14,9 +14,9 @@ import javax.lang.model.element.Modifier
  */
 
 
-def static start() {
+def static start(String address) {
 
-    def content = GApiUtil.GET_API(Config.API_PROJ_DEV_READER)
+    def content = GApiUtil.GET_API(address)
 
     def proInfo = new Gson().fromJson(GApiUtil.GET_API_JSON2Real(content), PrjBean.class)
 
@@ -27,7 +27,9 @@ def static start() {
     def real = "<pack>$xml</pack>"
     def langs = new XmlParser().parseText(real)
 
-    def a = langs.ul[1].li
+    def ul = langs.ul
+
+    def a = langs.ul[ul.size()-1].li
 
     def moduleName = a[2].text().split(' ').last()
     String version = a[3].text().split(' ').last()

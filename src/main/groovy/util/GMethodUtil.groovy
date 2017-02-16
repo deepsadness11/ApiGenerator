@@ -30,6 +30,10 @@ def addRequestParam(String type, String targetUrl, String methodName, List<Field
     def c = ClassName.get(Config.PACKAGE_NAME.COMMON, Config.COMMON_FILE_NAME)
     def pathCode = CodeBlock.builder().add('$T._BASE+\"' + "$targetUrl\"", c).build()
 
+    //
+    if (type.contains('/')) {
+        type = type.split('/')[1].replace(" ","")
+    }
 
     switch (type) {
         case 'get': mb.addAnnotation(AnnotationSpec.builder(GET.class).addMember('value', pathCode).build())
@@ -41,7 +45,7 @@ def addRequestParam(String type, String targetUrl, String methodName, List<Field
         case 'put': mb.addAnnotation(AnnotationSpec.builder(PUT.class).addMember('value', pathCode).build())
             addPutAndPostParam(methodName, paramList, mb); break
         default:
-            throw new RuntimeException('target method not support now!!')
+            throw new RuntimeException("current type==$type ,target method not support now!!")
     }
 
 }

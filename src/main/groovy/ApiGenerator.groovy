@@ -22,11 +22,10 @@ import javax.lang.model.element.Modifier
  * 实际Api字符串
  */
 
-def static start() {
+def static start(String address) {
     def realApiResponseJson
     if (Config.FROM_NET) {
         //Api的地址
-        def address = Config.API_DATA_DEV_READER
         realApiResponseJson = GApiUtil.GET_API_JSON(address)
         //保存到本地
 

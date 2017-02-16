@@ -35,7 +35,7 @@ public class Config {
     }
 
     public static class FILE_PATH {
-        public static String TOTAL_PATH = "d://ag";
+        public static String TOTAL_PATH = "d://gn";
         public static String REQUEST = TOTAL_PATH;
         public static String RESPONSE = TOTAL_PATH;
         public static String SERVICE = TOTAL_PATH;
