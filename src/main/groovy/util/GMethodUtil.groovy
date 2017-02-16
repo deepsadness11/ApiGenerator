@@ -27,14 +27,14 @@ import java.lang.reflect.Type
  */
 //判断请求的类型
 def addRequestParam(String type, String targetUrl, String methodName, List<FieldParam> paramList, MethodSpec.Builder mb) {
-    def c = ClassName.get(Config.PACKAGE_NAME.COMMON, "Common")
+    def c = ClassName.get(Config.PACKAGE_NAME.COMMON, Config.COMMON_FILE_NAME)
     def pathCode = CodeBlock.builder().add('$T._BASE+\"' + "$targetUrl\"", c).build()
 
 
     switch (type) {
         case 'get': mb.addAnnotation(AnnotationSpec.builder(GET.class).addMember('value', pathCode).build())
             addGetAndDeleteParam(paramList, mb); break
-        case 'post': mb.addAnnotation(AnnotationSpec.builder(POST.class).addMember('value',  pathCode).build())
+        case 'post': mb.addAnnotation(AnnotationSpec.builder(POST.class).addMember('value', pathCode).build())
             addPutAndPostParam(methodName, paramList, mb); break
         case 'delete': mb.addAnnotation(AnnotationSpec.builder(DELETE.class).addMember('value', pathCode).build())
             addGetAndDeleteParam(paramList, mb); break
@@ -155,7 +155,6 @@ private def generateRequestBodyParam(String methodName, List<FieldParam> fieldPa
     //生成对应的类
     //对应的类名。应该是方法名的
     //通过javaPoet生成对应的RequestParam
-
     String methodNameParamName = generateRequestBodyParamName(methodName)
 
     ClassName className = GPoetUtil.generateRequestParam(methodNameParamName, fieldParams)

@@ -163,7 +163,7 @@ static void addBodyParamToMethod(TypeName className, String methodNameParamName,
 static addBodyParamToMethod(Type className, String methodNameParamName, MethodSpec.Builder mb) {
 //将类用于生成参数
     ParameterSpec parameterSpec = ParameterSpec.builder(className, methodNameParamName)
-            .addModifiers(Modifier.FINAL)
+//            .addModifiers(Modifier.FINAL)
             .addAnnotation(AnnotationSpec.builder(Body.class).build())
             .build();
 

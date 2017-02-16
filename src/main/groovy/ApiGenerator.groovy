@@ -1,4 +1,5 @@
 import bean.ApiBean
+import com.squareup.javapoet.AnnotationSpec
 import com.squareup.javapoet.ClassName;
 import com.squareup.javapoet.MethodSpec;
 import com.squareup.javapoet.TypeSpec
@@ -20,21 +21,23 @@ import javax.lang.model.element.Modifier
 /**
  * 实际Api字符串
  */
-def realApiResponseJson
-if (Config.FROM_NET) {
-    //Api的地址
-    def address = Config.API_DEV_URL_READ
-    realApiResponseJson = GApiUtil.GET_API_JSON(address)
-    //保存到本地
+
+def static start() {
+    def realApiResponseJson
+    if (Config.FROM_NET) {
+        //Api的地址
+        def address = Config.API_DATA_DEV_READER
+        realApiResponseJson = GApiUtil.GET_API_JSON(address)
+        //保存到本地
 
 //    GApiUtil.GET_JSON2FILE(realApiResponseJson)
-} else {
-    //从离线缓存中获取
-    realApiResponseJson = GApiUtil.GET_FILE2String()
-}
+    } else {
+        //从离线缓存中获取
+        realApiResponseJson = GApiUtil.GET_FILE2String()
+    }
 
 //--------------->>2.通过Gson转化成Api对象
-def apiList = GApiUtil.CONVERT_TO_LIST(realApiResponseJson)
+    def apiList = GApiUtil.CONVERT_TO_LIST(realApiResponseJson)
 
 //def apiList = GApiUtil.CONVERT_TO_LIST(realApiResponseJson)
 
@@ -48,35 +51,42 @@ def apiList = GApiUtil.CONVERT_TO_LIST(realApiResponseJson)
 //util.GApiUtil.printlnProperties(apiList.api[4])
 
 //后面完成分部分
-TypeSpec.Builder totalClass;
+    TypeSpec.Builder totalClass;
 //--------------->>开始对单个工作
 //得到成功的返回
-def tempOpGroup
-def circleMechine = new circleParse()
-apiList.api.forEach {
-    op ->
-        //如果不相等
-        if (op.group != tempOpGroup) {
-            if (totalClass != null) {
-                //生成类
-                GPoetUtil.print2File(Config.FILE_PATH.SERVICE, Config.PACKAGE_NAME.SERVICE, totalClass.build())
-            }
-            tempOpGroup = op.group
-            String apiServiceName = "$tempOpGroup" + "ApiService"
+    def tempOpGroup
+    def circleMechine = new circleParse()
+    apiList.api.forEach {
+        op ->
+            //如果不相等
+            if (op.group != tempOpGroup) {
+                if (totalClass != null) {
+                    //生成类
+                    def MeAnno = ClassName.get('com.example.inter.ApiFactory', 'ApiFactory')
+                    totalClass.addAnnotation(AnnotationSpec.builder(MeAnno).build())
+                    GPoetUtil.print2File(Config.FILE_PATH.SERVICE, Config.PACKAGE_NAME.SERVICE, totalClass.build())
+                }
+                tempOpGroup = op.group
+                String apiServiceName = "$tempOpGroup" + "ApiService"
 //            println apiServiceName
-            totalClass = TypeSpec.interfaceBuilder(apiServiceName.capitalize())
-                    .addModifiers(Modifier.PUBLIC)
-        }
+                totalClass = TypeSpec.interfaceBuilder(apiServiceName.capitalize())
+                        .addModifiers(Modifier.PUBLIC)
+            }
 
-        operateOnEachApiBean(op, totalClass)
-}
-//循环结束也需要创建
-GPoetUtil.print2File(Config.FILE_PATH.SERVICE, Config.PACKAGE_NAME.SERVICE, totalClass.build())
+            operateOnEachApiBean(op, totalClass)
+    }
 
+    //给TotalClass 添加自定义的注解
+    def MeAnno = ClassName.get('com.example.inter.ApiFactory', 'ApiFactory')
+    totalClass.addAnnotation(AnnotationSpec.builder(MeAnno).build())
+
+//    GPoetUtil.print2Out(Config.PACKAGE_NAME.SERVICE, totalClass.build())
+    //循环结束也需要创建
+    GPoetUtil.print2File(Config.FILE_PATH.SERVICE, Config.PACKAGE_NAME.SERVICE, totalClass.build())
 //先创建类。暂时不分部分。
+}
 
-
-def operateOnEachApiBean(ApiBean op, TypeSpec.Builder totalClass) {
+def static operateOnEachApiBean(ApiBean op, TypeSpec.Builder totalClass) {
 
 //得到对应的方法名和类名
     def methodName = op.name.split("_").collect { it.capitalize() }.join("")
