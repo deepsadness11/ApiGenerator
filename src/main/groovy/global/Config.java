@@ -5,15 +5,6 @@ package global;
  */
 public class Config {
 
-    public static final String API_DATA_DEV_READER = "http://apidev.baobaobooks.net/docs/readerclub/api_data.js?v=1487067289562";
-    public static final String API_PROJ_DEV_READER = "http://apidev.baobaobooks.net/docs/readerclub/api_project.js?v=1487151780547";
-    public static final String API_PROJ_DEV_BOOKSHELF = "http://apidev.baobaobooks.net/docs/bookshelf/api_project.js?v=1487158608795";
-    public static final String API_DATA_DEV_BOOKSHELF = "http://apidev.baobaobooks.net/docs/bookshelf/api_data.js?v=1487158608795";
-    public static final String API_DATA_DEV_USER = "http://apidev.baobaobooks.net/docs/user/api_data.js?v=1487158747269";
-    public static final String API_PROJ_DEV_USER = "http://apidev.baobaobooks.net/docs/user/api_project.js?v=1487158747269";
-//    String API_DATA_DEV_USER = "http://apidev.baobaobooks.net/docs/user/api_project.js?v=1487158747269";
-//    String API_PROJ_DEV_USER = "http://apidev.baobaobooks.net/docs/user/api_project.js?v=1487158747269";
-
 
     public static String API_CACHE_FILE_NAME = "apiJson";
     /**
