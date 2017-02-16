@@ -4,7 +4,7 @@ import com.squareup.javapoet.ParameterizedTypeName
 import com.squareup.javapoet.TypeName
 import com.squareup.javapoet.TypeSpec
 import global.Config
-import global.ff
+
 import groovy.json.JsonSlurper
 import util.GPoetUtil
 

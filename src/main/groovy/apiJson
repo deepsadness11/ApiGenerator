@@ -10258,7 +10258,7 @@ define({ "api": [
   {
     "type": "delete",
     "url": "/courses/:course_id/courseware/:courseware_id",
-    "title": "删除课件",
+    "title": "删除课件素材",
     "name": "delete_courses__course_id_courseware__courseware_id",
     "group": "course",
     "version": "1.0.0",
@@ -10269,7 +10269,7 @@ define({ "api": [
         "description": "<p>需要在header中传递Authorization，详情参考“使用前必读”-“公共参数”</p>"
       }
     ],
-    "description": "<p>删除课件</p>",
+    "description": "<p>删除课件素材，单个删除</p>",
     "parameter": {
       "fields": {
         "Parameter": [
@@ -11735,7 +11735,7 @@ define({ "api": [
         "description": "<p>需要在header中传递Authorization，详情参考“使用前必读”-“公共参数”</p>"
       }
     ],
-    "description": "<p>更新课件素材，单个更新</p>",
+    "description": "<p>更新课件素材，单个更新时在path中传正确的courseware_id，多个更新时，设置courseware_id为0，之后将要更新的对象使用json传递</p>",
     "parameter": {
       "fields": {
         "Parameter": [
@@ -11779,7 +11779,12 @@ define({ "api": [
       "examples": [
         {
           "title": "请求示例",
-          "content": "{\n    \"courseware_id\":1,\n    \"order_num\":2\n}",
+          "content": "{\n    \"url\":\"\",\n    \"order_num\":2\n}",
+          "type": "json"
+        },
+        {
+          "title": "请求示例",
+          "content": "{\n    \"courseware\":[\n        {\n            \"courseware_id\":1,\n            \"order_num\":1,\n        },\n        {\n            \"courseware_id\":2,\n            \"order_num\":2,\n        }\n    ]\n}",
           "type": "json"
         }
       ]
@@ -11941,6 +11946,106 @@ define({ "api": [
   },
   {
     "type": "put",
+    "url": "/courses/:course_id/live",
+    "title": "更新课程直播状态",
+    "name": "put_courses__course_id_live",
+    "group": "course",
+    "version": "1.0.0",
+    "permission": [
+      {
+        "name": "token",
+        "title": "需要用户登录",
+        "description": "<p>需要在header中传递Authorization，详情参考“使用前必读”-“公共参数”</p>"
+      }
+    ],
+    "description": "<p>更新课程直播状态，该接口只有课程的讲师有权限操作</p>",
+    "parameter": {
+      "fields": {
+        "Parameter": [
+          {
+            "group": "Parameter",
+            "type": "Integer",
+            "optional": false,
+            "field": "course_id",
+            "description": "<p>课程id</p>"
+          },
+          {
+            "group": "Parameter",
+            "type": "Integer",
+            "optional": false,
+            "field": "live_status",
+            "description": "<p>直播状态，1结束直播，2未开始，3开始直播</p>"
+          }
+        ]
+      },
+      "examples": [
+        {
+          "title": "请求示例",
+          "content": "{\n    \"live_status\":3\n}",
+          "type": "json"
+        }
+      ]
+    },
+    "success": {
+      "examples": [
+        {
+          "title": "正确响应",
+          "content": "HTTP/1.1 204 No Content",
+          "type": "json"
+        }
+      ]
+    },
+    "error": {
+      "fields": {
+        "403": [
+          {
+            "group": "403",
+            "optional": false,
+            "field": "Forbidden",
+            "description": "<p>没有权限操作</p>"
+          }
+        ],
+        "404": [
+          {
+            "group": "404",
+            "optional": false,
+            "field": "NotFound",
+            "description": "<p>请求的资源不存在</p>"
+          }
+        ],
+        "错误 4xx": [
+          {
+            "group": "4xx",
+            "optional": false,
+            "field": "InvalidToken",
+            "description": "<p>未登录或授权过期，请登录</p>"
+          }
+        ]
+      },
+      "examples": [
+        {
+          "title": "NotFound:",
+          "content": "HTTP/1.1 404 Not Found\n{\n  \"code\": \"NotFound\",\n  \"message\": \"请求的资源不存在\"\n}",
+          "type": "json"
+        },
+        {
+          "title": "Forbidden:",
+          "content": "HTTP/1.1 403 Forbidden\n{\n    \"code\":\"Forbidden\",\n    \"message\":\"没有权限操作\"\n}",
+          "type": "json"
+        },
+        {
+          "title": "InvalidToken:",
+          "content": "HTTP/1.1 401 Unauthorized\n{\n  \"code\": \"InvalidToken\",\n  \"message\": \"未登录或授权过期，请登录\"\n}",
+          "type": "json"
+        }
+      ]
+    },
+    "filename": "readerclub/v1/course.php",
+    "groupTitle": "课程",
+    "groupDescription": "<p>阅读圈内的课程相关</p>"
+  },
+  {
+    "type": "put",
     "url": "/subscription/courses/:course_id",
     "title": "预约课程",
     "name": "put_subscription_courses__course_id",
@@ -11971,7 +12076,7 @@ define({ "api": [
       "examples": [
         {
           "title": "正确响应",
-          "content": "HTTP/1.1 200 No Content",
+          "content": "HTTP/1.1 204 No Content",
           "type": "json"
         }
       ]
