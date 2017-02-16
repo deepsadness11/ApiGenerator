@@ -19,7 +19,10 @@ void show() {
     def listPannel = {
         swingBuilder.comboBox(
                 items:
-                        ['阅读圈', '阅读家庭', '书架'],
+                        ['阅读圈',
+                         '阅读家庭'
+//                         , '书架'
+                        ],
                 preferredSize: [20, 20],
                 constraints: BorderLayout.NORTH,
                 actionPerformed: {
@@ -55,15 +58,21 @@ void show() {
 
         button(text: '点击开始生成',
                 actionPerformed: {
-                    println list.selectedItem
-                    try {
-                        outLabel.text = '正在生成.....'
-                        main.start(list.selectedItem.toString())
-                        outLabel.text = "<html>生成成功！！<br>请在D盘的根目录下的gn文件夹中复制文件</html>"
-                    } catch (Exception e) {
-                        e.printStackTrace()
-                        outLabel.text = "<html>发生错误<br> $e.message</html>"
-                    }
+                    ActionEvent event ->
+                        def btn = event.source
+                        btn.enabled = false
+//                        btn.setText('正在生成.....')
+                        println list.selectedItem
+                        try {
+                            outLabel.text = '正在生成.....'
+                            main.start(list.selectedItem.toString())
+                            outLabel.text = "<html>$list.selectedItem 模块生成成功！！<br>请在D盘的根目录下的gn文件夹中复制文件</html>"
+                        } catch (Exception e) {
+                            e.printStackTrace()
+                            outLabel.text = "<html>发生错误<br> $e.message</html>"
+                        }
+//                        btn.setText('点击开始生成')
+                        btn.enabled = true
                 })
     }
 }
