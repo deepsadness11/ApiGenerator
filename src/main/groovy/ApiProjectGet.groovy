@@ -29,30 +29,34 @@ def static start(String address) {
 
     def ul = langs.ul
 
-    def a = langs.ul[ul.size()-1].li
+    def a = langs.ul[ul.size() - 1].li
 
     def moduleName = a[2].text().split(' ').last()
     String version = a[3].text().split(' ').last()
 
     def bigMName = "$moduleName".capitalize()
+    def verName = "$bigMName".toUpperCase() + "_VERSION"
+    def mmName = "$moduleName".toUpperCase()
 
-
-    def mm = FieldSpec.builder(String.class, "$moduleName".toUpperCase())
+    def mm = FieldSpec.builder(String.class, mmName)
             .addModifiers(Modifier.PUBLIC, Modifier.STATIC, Modifier.FINAL)
             .initializer('$S', "$moduleName")
+            .build()
+
+    def ver = FieldSpec.builder(String.class, verName)
+            .initializer('$S', "$version")
+            .addModifiers(Modifier.PUBLIC, Modifier.STATIC, Modifier.FINAL)
             .build()
 
 //String SMS_BASE = "sms/" + SMS_VERSION + "/";
 //"$moduleName".toUpperCase() + '_BASE'
     def base = FieldSpec.builder(String.class, '_BASE')
             .addModifiers(Modifier.PUBLIC, Modifier.STATIC, Modifier.FINAL)
-            .initializer('$S', "$moduleName" + "/$version/")
+//            .initializer('$S', "$moduleName" + "/$version/")
+            .initializer("$mmName+\"/\"+$verName+\"/\"")
             .build()
 
-    def ver = FieldSpec.builder(String.class, "$bigMName".toUpperCase() + "_VERSION")
-            .initializer('$S', "$version")
-            .addModifiers(Modifier.PUBLIC, Modifier.STATIC, Modifier.FINAL)
-            .build()
+
 //生成Common文件
     Config.COMMON_FILE_NAME = bigMName + "Common"
 
@@ -60,8 +64,8 @@ def static start(String address) {
     TypeSpec common = TypeSpec.interfaceBuilder(Config.COMMON_FILE_NAME)
             .addModifiers(Modifier.PUBLIC)
             .addField(mm)
-            .addField(base)
             .addField(ver)
+            .addField(base)
 
 //    .addAnnotation(AnnotationSpec.builder(MeAnno).build())
 

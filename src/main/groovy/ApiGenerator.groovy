@@ -70,6 +70,8 @@ def static start(String address) {
 //            println apiServiceName
                 totalClass = TypeSpec.interfaceBuilder(apiServiceName.capitalize())
                         .addModifiers(Modifier.PUBLIC)
+                String doc = "groupTitle= $op.groupTitle  \ngroupDescription=$op.groupDescription  \n"
+                totalClass.addJavadoc(doc)
             }
 
             operateOnEachApiBean(op, totalClass)
@@ -119,19 +121,18 @@ def static operateOnEachApiBean(ApiBean op, TypeSpec.Builder totalClass) {
 //先将参数处理掉
     def totalParam = op.parameter?.fields?.Parameter
 
-    if (urlParamList) {
-        println 'sdfsf'
-    }
-
     if (totalParam) {
+        def tempParam = totalParam
+        def tempUrlParam = urlParamList;
         for (int i = 0; i < totalParam.size(); i++) {
             for (int j = 0; j < urlParamList.size(); j++) {
-                if (totalParam.get(i).field == urlParamList[j]) {
-                    totalParam.remove(i)
-                    urlParamList.remove(j)
+                if (totalParam[i].field == urlParamList[j]) {
+                    tempParam.remove(totalParam[i])
+//                    tempUrlParam.remove(urlParamList[j])
                 }
             }
         }
+        totalParam = tempParam
     }
 
     methodAdd.addRequestParam(type, targetUrl, methodName, totalParam, method)

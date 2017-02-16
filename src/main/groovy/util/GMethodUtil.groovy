@@ -92,8 +92,9 @@ def String generateMethodDoc(ApiBean op, MethodSpec.Builder method) {
  */
 private def addPutAndPostParam(String methodName, List<FieldParam> paramList, MethodSpec.Builder mb) {
     //1.先判断是否包含有binary类型的参数
-    if (null == paramList)
+    if (!paramList){
         return
+    }
 
     def isMultiBody = false
     paramList.forEach {
