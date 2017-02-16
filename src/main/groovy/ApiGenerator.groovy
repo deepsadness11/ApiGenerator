@@ -61,7 +61,7 @@ def static start(String address) {
             if (op.group != tempOpGroup) {
                 if (totalClass != null) {
                     //生成类
-                    def MeAnno = ClassName.get('com.example.inter.ApiFactory', 'ApiFactory')
+                    def MeAnno = ClassName.get('com.example.inter', 'ApiFactory')
                     totalClass.addAnnotation(AnnotationSpec.builder(MeAnno).build())
                     GPoetUtil.print2File(Config.FILE_PATH.SERVICE, Config.PACKAGE_NAME.SERVICE, totalClass.build())
                 }
