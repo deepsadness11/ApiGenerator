@@ -1,3 +1,5 @@
 Manifest-Version: 1.0
+Class-Path: gson-2.2.4.jar okio-1.8.0.jar groovy-all-2.3.11.jar okhttp
+ -3.3.0.jar javapoet-1.8.0.jar retrofit-2.1.0.jar
 Main-Class: gui
 

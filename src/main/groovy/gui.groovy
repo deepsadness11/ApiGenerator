@@ -67,5 +67,3 @@ void show() {
                 })
     }
 }
-
-show()

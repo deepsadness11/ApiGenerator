@@ -1,35 +1,321 @@
 define({ "api": [
   {
-    "type": "delete / post",
-    "url": "/user/bookshelf/batch",
-    "title": "批量书架删除",
+    "type": "delete",
+    "url": "/favorites/:favorite_id",
+    "title": "删除收藏",
+    "name": "delete_favorites__favorite_id",
+    "group": "favorite",
     "version": "1.0.0",
-    "name": "delete_user_bookshelf_batch",
-    "group": "bookshelf",
-    "permission": [
-      {
-        "name": "token",
-        "title": "需要用户登录",
-        "description": "<p>需要在header中传递Authorization，详情参考“使用前必读”-“公共参数”</p>"
-      }
-    ],
-    "description": "<p>批量书架删除</p>",
+    "description": "<p>删除收藏</p>",
     "parameter": {
       "fields": {
         "Parameter": [
           {
             "group": "Parameter",
-            "type": "Array",
+            "type": "Integer",
             "optional": false,
-            "field": "shelf_ids",
-            "description": "<p>书架的ID</p>"
+            "field": "favorite_id",
+            "description": "<p>收藏的id</p>"
+          }
+        ]
+      }
+    },
+    "success": {
+      "examples": [
+        {
+          "title": "正确响应",
+          "content": "HTTP/1.1 204 No Content",
+          "type": "json"
+        }
+      ]
+    },
+    "filename": "user/v1/favorite.php",
+    "groupTitle": "收藏",
+    "groupDescription": "<p>我的收藏相关</p>",
+    "error": {
+      "fields": {
+        "错误 4xx": [
+          {
+            "group": "4xx",
+            "optional": false,
+            "field": "InvalidToken",
+            "description": "<p>未登录或授权过期，请登录</p>"
+          },
+          {
+            "group": "4xx",
+            "optional": false,
+            "field": "NotFound",
+            "description": "<p>请求的资源不存在（详见message）</p>"
           }
         ]
       },
       "examples": [
         {
-          "title": "请求示例:",
-          "content": "{\n  \"shelf_ids\": [555483,640648]\n}",
+          "title": "InvalidToken:",
+          "content": "HTTP/1.1 401 Unauthorized\n{\n  \"code\": \"InvalidToken\",\n  \"message\": \"未登录或授权过期，请登录\"\n}",
+          "type": "json"
+        },
+        {
+          "title": "NotFound:",
+          "content": "HTTP/1.1 404 Not Found\n{\n  \"code\": \"NotFound\",\n  \"message\": \"请求的资源不存在\"\n}",
+          "type": "json"
+        }
+      ]
+    }
+  },
+  {
+    "type": "get",
+    "url": "/favorites?q=*&offset=*&limit",
+    "title": "获取我的收藏列表",
+    "name": "get_favorites",
+    "group": "favorite",
+    "version": "1.0.0",
+    "description": "<p>获取我的收藏列表</p>",
+    "parameter": {
+      "fields": {
+        "Parameter": [
+          {
+            "group": "Parameter",
+            "type": "String",
+            "optional": true,
+            "field": "q",
+            "description": "<p>查询关键字，用于搜索收藏内容</p>"
+          },
+          {
+            "group": "Parameter",
+            "type": "Integer",
+            "optional": false,
+            "field": "offset",
+            "defaultValue": "0",
+            "description": "<p>请求索引，默认0</p>"
+          },
+          {
+            "group": "Parameter",
+            "type": "Integer",
+            "optional": true,
+            "field": "limit",
+            "defaultValue": "10",
+            "description": "<p>请求的条数，默认10</p>"
+          }
+        ]
+      }
+    },
+    "success": {
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "next",
+            "description": "<p>下一页请求的offset，<strong>当不再多更多数据时，值为-1</strong></p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Object[]",
+            "optional": false,
+            "field": "items",
+            "description": "<p>列表</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "items.favorite_id",
+            "description": "<p>收藏的id</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "items.favorite_type",
+            "description": "<p>类型，1表示内容，2表示商品</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "items.favorite_type_id",
+            "description": "<p>类型id，比如商品时为goods_id</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "items.title",
+            "description": "<p>收藏内容的title，内容时为内容的title，商品时为商品的名称</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "items.summary",
+            "description": "<p>收藏内容的摘要，内容时为内容摘要，商品时为商品简介</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "items.content_type",
+            "description": "<p>收藏的内容的类型，1代表图片，2代表视频，3代表音频，4代表图文，5代表说说</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "items.cover",
+            "description": "<p>收藏内容的cover，内容时为内容的cover，商品时为商品的cover</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "items.user_id",
+            "description": "<p>收藏内容的用户id</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "items.user_name",
+            "description": "<p>收藏内容的用户名</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "items.user_avatar",
+            "description": "<p>收藏内容的用户头像</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "items.goods_url",
+            "description": "<p>收藏的商品在童书馆的URL</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "items.market_price_format",
+            "description": "<p>格式化后的商品市场价</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "items.shop_price_format",
+            "description": "<p>格式化后的商品零售价</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "items.store_id",
+            "description": "<p>收藏商品的童书馆id</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "items.store_name",
+            "description": "<p>收藏商品的童书馆名称</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "items.store_avatar",
+            "description": "<p>收藏商品的童书馆头像</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "items.store_url",
+            "description": "<p>收藏商品的童书馆URL</p>"
+          }
+        ]
+      },
+      "examples": [
+        {
+          "title": "正确响应",
+          "content": "HTTP/1.1 200 Ok\n{\n    \"next\":4,\n    \"items\":[{\n        \"favorite_id\":12,\n        \"favorite_type\":1,\n        \"favorite_type_id\":1323,\n        \"title\":\"\",\n        \"summary\":\"\",\n        \"content_type\":1,\n        \"cover\":\"\",\n        \"user_id\":\"\",\n        \"user_name\":\"\",\n        \"user_avatar\":\"\",\n        \"goods_url\":\"\",\n        \"market_price_format\":\"\",\n        \"shop_price_format\":\"\",\n        \"store_id\":223,\n        \"store_name\":\"\",\n        \"store_avatar\":\"\",\n        \"store_url\":\"\"\n    }]\n}",
+          "type": "json"
+        }
+      ]
+    },
+    "sampleRequest": [
+      {
+        "url": "https://api.baobaobooks.net/user/v1/favorites?page=1"
+      }
+    ],
+    "filename": "user/v1/favorite.php",
+    "groupTitle": "收藏",
+    "groupDescription": "<p>我的收藏相关</p>",
+    "error": {
+      "fields": {
+        "错误 4xx": [
+          {
+            "group": "4xx",
+            "optional": false,
+            "field": "InvalidToken",
+            "description": "<p>未登录或授权过期，请登录</p>"
+          },
+          {
+            "group": "4xx",
+            "optional": false,
+            "field": "NotFound",
+            "description": "<p>请求的资源不存在（详见message）</p>"
+          }
+        ]
+      },
+      "examples": [
+        {
+          "title": "InvalidToken:",
+          "content": "HTTP/1.1 401 Unauthorized\n{\n  \"code\": \"InvalidToken\",\n  \"message\": \"未登录或授权过期，请登录\"\n}",
+          "type": "json"
+        },
+        {
+          "title": "NotFound:",
+          "content": "HTTP/1.1 404 Not Found\n{\n  \"code\": \"NotFound\",\n  \"message\": \"请求的资源不存在\"\n}",
+          "type": "json"
+        }
+      ]
+    }
+  },
+  {
+    "type": "post",
+    "url": "/favorites",
+    "title": "新增收藏",
+    "name": "post_favorites",
+    "group": "favorite",
+    "version": "1.0.0",
+    "description": "<p>新增收藏，收藏内容可以是内容content，也可以是商品goods</p>",
+    "parameter": {
+      "fields": {
+        "Parameter": [
+          {
+            "group": "Parameter",
+            "type": "Integer",
+            "optional": false,
+            "field": "favorite_type",
+            "description": "<p>类型，1表示内容，2表示商品</p>"
+          },
+          {
+            "group": "Parameter",
+            "type": "Integer",
+            "optional": false,
+            "field": "favorite_type_id",
+            "description": "<p>类型id，比如商品时为goods_id</p>"
+          }
+        ]
+      },
+      "examples": [
+        {
+          "title": "请求示例",
+          "content": "{\n    \"favorite_type\":1,\n    \"favorite_type_id\":9240\n}",
           "type": "json"
         }
       ]
@@ -37,7 +323,7 @@ define({ "api": [
     "success": {
       "examples": [
         {
-          "title": "正确响应:",
+          "title": "正确响应",
           "content": "HTTP/1.1 204 No Content",
           "type": "json"
         }
@@ -73,24 +359,18 @@ define({ "api": [
         }
       ]
     },
-    "filename": "bookshelf/v1/bookshelf.php",
-    "groupTitle": "书架",
-    "groupDescription": "<p>书架模块相关接口</p>"
+    "filename": "user/v1/favorite.php",
+    "groupTitle": "收藏",
+    "groupDescription": "<p>我的收藏相关</p>"
   },
   {
-    "type": "get",
-    "url": "/bookshelf/books/:isbn_id",
-    "title": "获取绘本详情",
+    "type": "delete",
+    "url": "/following/:user_id",
+    "title": "取消关注某人",
+    "name": "delete_following__user_id",
+    "group": "following",
     "version": "1.0.0",
-    "name": "get_bookshelf_books__isbn_id",
-    "group": "bookshelf",
-    "permission": [
-      {
-        "name": "token",
-        "title": "需要用户登录",
-        "description": "<p>需要在header中传递Authorization，详情参考“使用前必读”-“公共参数”</p>"
-      }
-    ],
+    "description": "<p>取消关注某人</p>",
     "parameter": {
       "fields": {
         "Parameter": [
@@ -98,157 +378,63 @@ define({ "api": [
             "group": "Parameter",
             "type": "Integer",
             "optional": false,
-            "field": "isbn_id",
-            "description": "<p>ISBN对应的ID，是主键</p>"
+            "field": "user_id",
+            "description": "<p>用户id</p>"
           }
         ]
       }
     },
     "success": {
-      "fields": {
-        "成功 200 OK": [
-          {
-            "group": "200",
-            "type": "String",
-            "optional": false,
-            "field": "bookname",
-            "description": "<p>绘本书名</p>"
-          },
-          {
-            "group": "200",
-            "type": "String",
-            "optional": false,
-            "field": "bookshelf_img",
-            "description": "<p>绘本缩略图</p>"
-          },
-          {
-            "group": "200",
-            "type": "String",
-            "optional": false,
-            "field": "book_brief",
-            "description": "<p>绘本介绍</p>"
-          },
-          {
-            "group": "200",
-            "type": "String",
-            "optional": false,
-            "field": "author_name",
-            "description": "<p>作者</p>"
-          },
-          {
-            "group": "200",
-            "type": "String",
-            "optional": false,
-            "field": "drawer_name",
-            "description": "<p>绘者</p>"
-          },
-          {
-            "group": "200",
-            "type": "Integer",
-            "optional": false,
-            "field": "is_audio",
-            "description": "<p>是否有音频资源：1-有，0-无</p>"
-          },
-          {
-            "group": "200",
-            "type": "Integer",
-            "optional": false,
-            "field": "is_video",
-            "description": "<p>是否有视频资源：1-有，0-无</p>"
-          },
-          {
-            "group": "200",
-            "type": "Integer",
-            "optional": false,
-            "field": "is_course",
-            "description": "<p>是否有相关课程：1-有，0-无</p>"
-          },
-          {
-            "group": "200",
-            "type": "Integer",
-            "optional": false,
-            "field": "is_content",
-            "description": "<p>是否有相关文章：1-有，0-无</p>"
-          },
-          {
-            "group": "200",
-            "type": "Integer",
-            "optional": false,
-            "field": "is_allabout",
-            "description": "<p>是否提供All About资源：1-有，0-无</p>"
-          },
-          {
-            "group": "200",
-            "type": "String",
-            "optional": false,
-            "field": "share_url",
-            "description": "<p>分享链接</p>"
-          },
-          {
-            "group": "200",
-            "type": "String",
-            "optional": false,
-            "field": "shop_url",
-            "description": "<p>购买链接</p>"
-          }
-        ]
-      },
       "examples": [
         {
-          "title": "正确响应:",
-          "content": "HTTP/1.1 200 OK\n{\n \"isbn_id\": \"1330\",\n \"goods_id\": \"5705\",\n \"bookname\": \"美国加州 Evan-Moor 出品学生用书 技巧磨练阅读系列 Skill Sharpeners Reading Grade K【平装】（幼儿园）\",\n \"book_brief\": \"美国原装进口。\\r\\nEvan-Moor Educational Publishers\\r\\n美国加州非常著名的教材出版社，自1979年以来，便一直致力于提供教育者最实用、创意及吸引人的幼儿教育产品，支援与丰富教学课程。\",\n \"is_audio\": 1,\n \"is_video\": 0,\n \"is_course\": 0,\n \"is_content\": 1,\n\"is_allabout\": 0,\n \"author_name\": \"Jane Yolen\",\n \"drawer_name\": \"Mark Teague\",\n \"bookshelf_img\": \"https://oss.baobaobooks.net/images/201408/thumb_img/5705_thumb_G_1407312354926.jpg?w=320&h=320\",\n \"shop_url\": \"https://fxm5547.baobaobooks.net/goods/5705\",\n \"share_url\": \"http://zl.baobaobooks.net/share/books/1330?share_user_id=36845&from=ayb-ios\"\n}",
+          "title": "正确响应",
+          "content": "HTTP/1.1 204 No Content",
           "type": "json"
         }
       ]
     },
+    "filename": "user/v1/following.php",
+    "groupTitle": "关注",
+    "groupDescription": "<p>我的关注和我的粉丝</p>",
     "error": {
       "fields": {
         "错误 4xx": [
           {
             "group": "4xx",
             "optional": false,
-            "field": "ValidationError",
-            "description": ""
+            "field": "InvalidToken",
+            "description": "<p>未登录或授权过期，请登录</p>"
+          },
+          {
+            "group": "4xx",
+            "optional": false,
+            "field": "NotFound",
+            "description": "<p>请求的资源不存在（详见message）</p>"
           }
         ]
       },
       "examples": [
         {
-          "title": "ValidationError:",
-          "content": "HTTP/1.1 422 Unprocessable Entity\n{\n  \"code\": \"ValidationError\",\n  \"message\": \"未传递header参数X-HB-Client-Type\"\n}",
+          "title": "InvalidToken:",
+          "content": "HTTP/1.1 401 Unauthorized\n{\n  \"code\": \"InvalidToken\",\n  \"message\": \"未登录或授权过期，请登录\"\n}",
           "type": "json"
         },
         {
-          "title": "ValidationError:",
-          "content": "HTTP/1.1 422 Unprocessable Entity\n{\n  \"code\": \"ValidationError\",\n  \"message\": \"输入字段验证出错，缺少字段或字段格式有误\"\n}",
+          "title": "NotFound:",
+          "content": "HTTP/1.1 404 Not Found\n{\n  \"code\": \"NotFound\",\n  \"message\": \"请求的资源不存在\"\n}",
           "type": "json"
         }
       ]
-    },
-    "sampleRequest": [
-      {
-        "url": "https://api.baobaobooks.net/bookshelf/v1/books/4510/contents"
-      }
-    ],
-    "filename": "bookshelf/v1/bookshelf.php",
-    "groupTitle": "书架",
-    "groupDescription": "<p>书架模块相关接口</p>"
+    }
   },
   {
     "type": "get",
-    "url": "/bookshelf/books/:isbn_id/audios",
-    "title": "获取书籍下的音频资源列表",
+    "url": "/followers?offset=*&limit",
+    "title": "获取我的粉丝列表",
+    "name": "get_followers",
+    "group": "following",
     "version": "1.0.0",
-    "name": "get_bookshelf_books__isbn_id_audios",
-    "group": "bookshelf",
-    "permission": [
-      {
-        "name": "token",
-        "title": "需要用户登录",
-        "description": "<p>需要在header中传递Authorization，详情参考“使用前必读”-“公共参数”</p>"
-      }
-    ],
-    "description": "<p>获取书籍下的文章列表，<strong>返回数据中is_visible=0的资源是不可看的，APP端直接给出提示</strong></p>",
+    "description": "<p>获取我的粉丝列表</p>",
     "parameter": {
       "fields": {
         "Parameter": [
@@ -256,294 +442,130 @@ define({ "api": [
             "group": "Parameter",
             "type": "Integer",
             "optional": false,
-            "field": "isbn_id",
-            "description": "<p>ISBN对应的ID，是主键</p>"
+            "field": "offset",
+            "defaultValue": "0",
+            "description": "<p>请求索引，默认0</p>"
+          },
+          {
+            "group": "Parameter",
+            "type": "Integer",
+            "optional": true,
+            "field": "limit",
+            "defaultValue": "10",
+            "description": "<p>请求的条数，默认10</p>"
           }
         ]
       }
     },
     "success": {
       "fields": {
-        "成功 200 OK": [
+        "Success 200": [
           {
-            "group": "200",
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "next",
+            "description": "<p>下一页请求的offset，<strong>当不再多更多数据时，值为-1</strong></p>"
+          },
+          {
+            "group": "Success 200",
             "type": "Object[]",
             "optional": false,
             "field": "items",
-            "description": "<p><strong>数据</strong></p>"
+            "description": "<p>列表</p>"
           },
           {
-            "group": "200",
-            "type": "Integer",
-            "optional": false,
-            "field": "resource_id",
-            "description": "<p>资源ID</p>"
-          },
-          {
-            "group": "200",
-            "type": "String",
-            "optional": false,
-            "field": "resource_name",
-            "description": "<p>资源名称</p>"
-          },
-          {
-            "group": "200",
-            "type": "Integer",
-            "optional": false,
-            "field": "resource_type",
-            "description": "<p>资源类型：2代表视频，3代表音频</p>"
-          },
-          {
-            "group": "200",
-            "type": "Integer",
-            "optional": false,
-            "field": "is_visible",
-            "description": "<p>内容是否可看，1-可以，0-不可以</p>"
-          },
-          {
-            "group": "200",
-            "type": "String",
-            "optional": false,
-            "field": "resource_cover",
-            "description": "<p>资源封面图</p>"
-          },
-          {
-            "group": "200",
-            "type": "String",
-            "optional": false,
-            "field": "audio_url",
-            "description": "<p>音频的地址，该地址需要鉴权</p>"
-          },
-          {
-            "group": "200",
-            "type": "String",
-            "optional": false,
-            "field": "audio_lyric",
-            "description": "<p>音频歌词</p>"
-          },
-          {
-            "group": "200",
-            "type": "String",
-            "optional": false,
-            "field": "duration",
-            "description": "<p>资源时长</p>"
-          }
-        ]
-      },
-      "examples": [
-        {
-          "title": "正确响应:",
-          "content": "HTTP/1.1 200 OK\n{\n \"items\": [\n   {\n     \"resource_id\": \"579\",\n     \"resource_name\": \"美国加州 Evan-Moor 出品学生用书 技巧磨练阅读系列 Skill Sharpeners Reading Grade K【平装】（幼儿园）-01\",\n     \"resource_cover\": \"https://osstest.baobaobooks.net/ayb/images/content/201604/146105837282387_radio_img.jpg\",\n     \"audio_url\": \"https://v.baobaobooks.net/audio/content/201602/145596081264974.mp3?auth_key=1467024151-0-0-7ab227ed186849e050081bb25207b92b\",\n     \"audio_lyric\": \"\",\n     \"is_visible\": 0,\n     \"duration\": \"\"\n   },\n   {\n     \"resource_id\": \"580\",\n     \"resource_name\": \"美国加州 Evan-Moor 出品学生用书 技巧磨练阅读系列 Skill Sharpeners Reading Grade K【平装】（幼儿园）-02\",\n     \"resource_cover\": \"https://osstest.baobaobooks.net/ayb/images/content/201604/146105837282387_radio_img.jpg\",\n     \"audio_url\": \"https://v.baobaobooks.net/audio/content/201602/145596148077190.mp3?auth_key=1467024151-0-0-7e00209a88f3364bf9b3a44461efa96f\",\n     \"audio_lyric\": \"\",\n     \"is_visible\": 0,\n     \"duration\": \"\"\n   }\n ]\n}",
-          "type": "json"
-        }
-      ]
-    },
-    "error": {
-      "fields": {
-        "错误 4xx": [
-          {
-            "group": "4xx",
-            "optional": false,
-            "field": "ValidationError",
-            "description": ""
-          }
-        ]
-      },
-      "examples": [
-        {
-          "title": "ValidationError:",
-          "content": "HTTP/1.1 422 Unprocessable Entity\n{\n  \"code\": \"ValidationError\",\n  \"message\": \"未传递header参数X-HB-Client-Type\"\n}",
-          "type": "json"
-        },
-        {
-          "title": "ValidationError:",
-          "content": "HTTP/1.1 422 Unprocessable Entity\n{\n  \"code\": \"ValidationError\",\n  \"message\": \"输入字段验证出错，缺少字段或字段格式有误\"\n}",
-          "type": "json"
-        }
-      ]
-    },
-    "sampleRequest": [
-      {
-        "url": "https://api.baobaobooks.net/bookshelf/v1/books/4510/contents"
-      }
-    ],
-    "filename": "bookshelf/v1/bookshelf.php",
-    "groupTitle": "书架",
-    "groupDescription": "<p>书架模块相关接口</p>"
-  },
-  {
-    "type": "get",
-    "url": "/bookshelf/books/:isbn_id/contents",
-    "title": "获取书籍下的文章列表",
-    "version": "1.0.0",
-    "name": "get_bookshelf_books__isbn_id_contents",
-    "group": "bookshelf",
-    "permission": [
-      {
-        "name": "token",
-        "title": "需要用户登录",
-        "description": "<p>需要在header中传递Authorization，详情参考“使用前必读”-“公共参数”</p>"
-      }
-    ],
-    "description": "<p>获取书籍下的文章列表</p>",
-    "parameter": {
-      "fields": {
-        "Parameter": [
-          {
-            "group": "Parameter",
-            "type": "Integer",
-            "optional": false,
-            "field": "isbn_id",
-            "description": "<p>ISBN对应的ID，是主键</p>"
-          }
-        ]
-      }
-    },
-    "success": {
-      "fields": {
-        "成功 200 OK": [
-          {
-            "group": "200",
-            "type": "Array",
-            "optional": false,
-            "field": "items",
-            "description": "<p><strong>数据</strong></p>"
-          },
-          {
-            "group": "200",
-            "type": "Integer",
-            "optional": false,
-            "field": "items.content_id",
-            "description": "<p>内容的ID</p>"
-          },
-          {
-            "group": "200",
-            "type": "Integer",
-            "optional": false,
-            "field": "items.content_type",
-            "description": "<p>类型，2代表视频，3代表音频，4代表图文</p>"
-          },
-          {
-            "group": "200",
+            "group": "Success 200",
             "type": "Integer",
             "optional": false,
             "field": "items.user_id",
-            "description": "<p>用户ID</p>"
+            "description": ""
           },
           {
-            "group": "200",
+            "group": "Success 200",
             "type": "String",
             "optional": false,
             "field": "items.user_name",
-            "description": "<p>用户名</p>"
+            "description": "<p>用户名称</p>"
           },
           {
-            "group": "200",
+            "group": "Success 200",
             "type": "String",
             "optional": false,
-            "field": "items.title",
-            "description": "<p>标题</p>"
+            "field": "items.avatar",
+            "description": "<p>用户头像URL</p>"
           },
           {
-            "group": "200",
+            "group": "Success 200",
             "type": "String",
             "optional": false,
-            "field": "items.summary",
-            "description": "<p>摘要</p>"
+            "field": "items.signture",
+            "description": "<p>用户签名</p>"
           },
           {
-            "group": "200",
-            "type": "String",
-            "optional": false,
-            "field": "items.cover_thumb",
-            "description": "<p>封面图（小），尺寸150*150</p>"
-          },
-          {
-            "group": "200",
-            "type": "String",
-            "optional": false,
-            "field": "items.cover_middle",
-            "description": "<p>封面图（中），尺寸480*270</p>"
-          },
-          {
-            "group": "200",
-            "type": "String",
-            "optional": false,
-            "field": "items.pub_time",
-            "description": "<p>发布时间</p>"
-          },
-          {
-            "group": "200",
+            "group": "Success 200",
             "type": "Integer",
             "optional": false,
-            "field": "items.praise",
-            "description": "<p>点赞数</p>"
-          },
-          {
-            "group": "200",
-            "type": "Integer",
-            "optional": false,
-            "field": "items.click",
-            "description": "<p>点击数</p>"
+            "field": "items.friend_status",
+            "description": "<p>关注状态，0双方都未关注对方；1当前用户关注了对方，对方没有关注当前用户；2当前用户没有关注对方，对方关注了当前用户；3双方互相关注。</p>"
           }
         ]
       },
       "examples": [
         {
-          "title": "正确响应:",
-          "content": "HTTP/1.1 200 OK\n{\n \"items\": [\n   {\n     \"content_id\": \"933\",\n     \"content_type\": \"2\",\n     \"user_id\": \"56938\",\n     \"title\": \"测试专栏PC端上传视频封面图（未上传封面图 ）\",\n     \"summary\": null,\n     \"cover_middle\": \"https://osstest.baobaobooks.net/ayb/images/content/201602/145621438198560_middle.jpg\",\n     \"cover_thumb\": \"https://osstest.baobaobooks.net/ayb/images/content/201602/145621438198560_thumb.jpg\",\n     \"pub_time\": \"28天前\",\n     \"user_name\": \"luse\",\n     \"praise\": 0,\n     \"click\": 10\n   },\n   ...\n ]\n}",
-          "type": "json"
-        }
-      ]
-    },
-    "error": {
-      "fields": {
-        "错误 4xx": [
-          {
-            "group": "4xx",
-            "optional": false,
-            "field": "ValidationError",
-            "description": ""
-          }
-        ]
-      },
-      "examples": [
-        {
-          "title": "ValidationError:",
-          "content": "HTTP/1.1 422 Unprocessable Entity\n{\n  \"code\": \"ValidationError\",\n  \"message\": \"未传递header参数X-HB-Client-Type\"\n}",
-          "type": "json"
-        },
-        {
-          "title": "ValidationError:",
-          "content": "HTTP/1.1 422 Unprocessable Entity\n{\n  \"code\": \"ValidationError\",\n  \"message\": \"输入字段验证出错，缺少字段或字段格式有误\"\n}",
+          "title": "正确响应",
+          "content": "\t  HTTP/1.1 200 Ok\n  {\n\t\t\"next\": 4,\n\t\t\"items\": [\n\t\t\t{\n\t\t\t\t\"user_id\": 2343,\n\t\t\t\t\"username\": \"湖南\",\n\t\t\t\t\"avatar\": \"用户头像URL\",\n\t\t\t\t\"signture\": \"用户签名\",\n\t\t\t\t\"friend_status\": 1\n\t\t\t}\n\t\t]\n\t }",
           "type": "json"
         }
       ]
     },
     "sampleRequest": [
       {
-        "url": "https://api.baobaobooks.net/bookshelf/v1/books/4510/contents"
+        "url": "https://api.baobaobooks.net/user/v1/followers?page=1"
       }
     ],
-    "filename": "bookshelf/v1/bookshelf.php",
-    "groupTitle": "书架",
-    "groupDescription": "<p>书架模块相关接口</p>"
+    "filename": "user/v1/following.php",
+    "groupTitle": "关注",
+    "groupDescription": "<p>我的关注和我的粉丝</p>",
+    "error": {
+      "fields": {
+        "错误 4xx": [
+          {
+            "group": "4xx",
+            "optional": false,
+            "field": "InvalidToken",
+            "description": "<p>未登录或授权过期，请登录</p>"
+          },
+          {
+            "group": "4xx",
+            "optional": false,
+            "field": "NotFound",
+            "description": "<p>请求的资源不存在（详见message）</p>"
+          }
+        ]
+      },
+      "examples": [
+        {
+          "title": "InvalidToken:",
+          "content": "HTTP/1.1 401 Unauthorized\n{\n  \"code\": \"InvalidToken\",\n  \"message\": \"未登录或授权过期，请登录\"\n}",
+          "type": "json"
+        },
+        {
+          "title": "NotFound:",
+          "content": "HTTP/1.1 404 Not Found\n{\n  \"code\": \"NotFound\",\n  \"message\": \"请求的资源不存在\"\n}",
+          "type": "json"
+        }
+      ]
+    }
   },
   {
     "type": "get",
-    "url": "/bookshelf/books/:isbn_id/courses",
-    "title": "获取书籍下的课程列表",
+    "url": "/following?offset=*&limit",
+    "title": "获取我的关注列表",
+    "name": "get_following",
+    "group": "following",
     "version": "1.0.0",
-    "name": "get_bookshelf_books__isbn_id_courses",
-    "group": "bookshelf",
-    "permission": [
-      {
-        "name": "token",
-        "title": "需要用户登录",
-        "description": "<p>需要在header中传递Authorization，详情参考“使用前必读”-“公共参数”</p>"
-      }
-    ],
-    "description": "<p>获取书籍下的文章列表</p>",
+    "description": "<p>获取我的关注列表</p>",
     "parameter": {
       "fields": {
         "Parameter": [
@@ -551,925 +573,193 @@ define({ "api": [
             "group": "Parameter",
             "type": "Integer",
             "optional": false,
-            "field": "isbn_id",
-            "description": "<p>ISBN对应的ID，是主键</p>"
-          }
-        ]
-      }
-    },
-    "success": {
-      "fields": {
-        "成功 200 OK": [
-          {
-            "group": "200",
-            "type": "Integer",
-            "optional": false,
-            "field": "course_id",
-            "description": "<p>当前课程标识</p>"
+            "field": "offset",
+            "defaultValue": "0",
+            "description": "<p>请求索引，默认0</p>"
           },
-          {
-            "group": "200",
-            "type": "String",
-            "optional": false,
-            "field": "course_name",
-            "description": "<p>当前课程名称</p>"
-          },
-          {
-            "group": "200",
-            "type": "String",
-            "optional": false,
-            "field": "introduce",
-            "description": "<p>当前课程介绍</p>"
-          },
-          {
-            "group": "200",
-            "type": "String",
-            "optional": false,
-            "field": "course_img_thumb",
-            "description": "<p>当前课程介绍图，即“今日课程”下方的图，625*352 px</p>"
-          },
-          {
-            "group": "200",
-            "type": "String",
-            "optional": false,
-            "field": "course_img_middle",
-            "description": "<p>当前课程内容背景图，即进入课程后内容的背景图，759*1334 px</p>"
-          }
-        ]
-      },
-      "examples": [
-        {
-          "title": "正确响应:",
-          "content": "HTTP/1.1 200 OK\n{\n \"items\": [\n   {\n     \"course_id\": \"35\",\n     \"course_name\": \"Dive in, Ducky第一课\",\n     \"introduce\": \"洗澡书+洞洞书+手偶书三合一\",\n     \"course_img_middle\": \"https://osstest.baobaobooks.net/ayb/images/course/201605/146466483095671_middle.jpg\",\n     \"course_img_thumb\": \"https://osstest.baobaobooks.net/ayb/images/course/201605/146466483095671_thumb.jpg\"\n   },\n   {\n     \"course_id\": \"36\",\n     \"course_name\": \"Dive in, Ducky第二课\",\n     \"introduce\": \"\",\n     \"course_img_middle\": \"https://osstest.baobaobooks.net/ayb/images/course/201605/146466485059786_middle.jpg\",\n     \"course_img_thumb\": \"https://osstest.baobaobooks.net/ayb/images/course/201605/146466485059786_thumb.jpg\"\n   }\n ]\n}",
-          "type": "json"
-        }
-      ]
-    },
-    "error": {
-      "fields": {
-        "错误 4xx": [
-          {
-            "group": "4xx",
-            "optional": false,
-            "field": "ValidationError",
-            "description": ""
-          }
-        ]
-      },
-      "examples": [
-        {
-          "title": "ValidationError:",
-          "content": "HTTP/1.1 422 Unprocessable Entity\n{\n  \"code\": \"ValidationError\",\n  \"message\": \"未传递header参数X-HB-Client-Type\"\n}",
-          "type": "json"
-        },
-        {
-          "title": "ValidationError:",
-          "content": "HTTP/1.1 422 Unprocessable Entity\n{\n  \"code\": \"ValidationError\",\n  \"message\": \"输入字段验证出错，缺少字段或字段格式有误\"\n}",
-          "type": "json"
-        }
-      ]
-    },
-    "sampleRequest": [
-      {
-        "url": "https://api.baobaobooks.net/bookshelf/v1/books/4510/contents"
-      }
-    ],
-    "filename": "bookshelf/v1/bookshelf.php",
-    "groupTitle": "书架",
-    "groupDescription": "<p>书架模块相关接口</p>"
-  },
-  {
-    "type": "get",
-    "url": "/bookshelf/books/:isbn_id/videos",
-    "title": "获取书籍下的视频资源列表",
-    "version": "1.0.0",
-    "name": "get_bookshelf_books__isbn_id_videos",
-    "group": "bookshelf",
-    "permission": [
-      {
-        "name": "token",
-        "title": "需要用户登录",
-        "description": "<p>需要在header中传递Authorization，详情参考“使用前必读”-“公共参数”</p>"
-      }
-    ],
-    "description": "<p>获取书籍下的文章列表，<strong>返回数据中is_visible=0的资源是不可看的，APP端直接给出提示</strong></p>",
-    "parameter": {
-      "fields": {
-        "Parameter": [
           {
             "group": "Parameter",
             "type": "Integer",
-            "optional": false,
-            "field": "isbn_id",
-            "description": "<p>ISBN对应的ID，是主键</p>"
+            "optional": true,
+            "field": "limit",
+            "defaultValue": "10",
+            "description": "<p>请求的条数，默认10</p>"
           }
         ]
       }
     },
     "success": {
       "fields": {
-        "成功 200 OK": [
+        "Success 200": [
           {
-            "group": "200",
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "next",
+            "description": "<p>下一页请求的offset，<strong>当不再多更多数据时，值为-1</strong></p>"
+          },
+          {
+            "group": "Success 200",
             "type": "Object[]",
             "optional": false,
             "field": "items",
-            "description": "<p><strong>数据</strong></p>"
+            "description": "<p>列表</p>"
           },
           {
-            "group": "200",
-            "type": "Integer",
-            "optional": false,
-            "field": "resource_id",
-            "description": "<p>资源ID</p>"
-          },
-          {
-            "group": "200",
-            "type": "String",
-            "optional": false,
-            "field": "resource_name",
-            "description": "<p>资源名称</p>"
-          },
-          {
-            "group": "200",
-            "type": "Integer",
-            "optional": false,
-            "field": "resource_type",
-            "description": "<p>资源类型：2代表视频，3代表音频</p>"
-          },
-          {
-            "group": "200",
-            "type": "Integer",
-            "optional": false,
-            "field": "is_visible",
-            "description": "<p>内容是否可看，1-可以，0-不可以</p>"
-          },
-          {
-            "group": "200",
-            "type": "String",
-            "optional": false,
-            "field": "resource_cover",
-            "description": "<p>资源封面图</p>"
-          },
-          {
-            "group": "200",
-            "type": "Object",
-            "optional": false,
-            "field": "mvs_video_info",
-            "description": "<p><strong>微视频信息</strong></p>"
-          },
-          {
-            "group": "200",
-            "type": "Object",
-            "optional": false,
-            "field": "video_play_url",
-            "description": "<p><strong>微视频播放地址信息</strong></p>"
-          },
-          {
-            "group": "200",
-            "type": "String",
-            "optional": false,
-            "field": "f0",
-            "description": "<p>微视频源文件播放地址，格式多样，不建议使用</p>"
-          },
-          {
-            "group": "200",
-            "type": "String",
-            "optional": false,
-            "field": "f10",
-            "description": "<p>微视频标清播放地址</p>"
-          },
-          {
-            "group": "200",
-            "type": "String",
-            "optional": false,
-            "field": "f20",
-            "description": "<p>微视频高清播放地址</p>"
-          },
-          {
-            "group": "200",
-            "type": "String",
-            "optional": false,
-            "field": "f30",
-            "description": "<p>微视频超清播放地址</p>"
-          }
-        ]
-      },
-      "examples": [
-        {
-          "title": "正确响应:",
-          "content": "HTTP/1.1 200 OK\n{\n \"items\": [\n   {\n     \"resource_id\": \"616\",\n     \"resource_name\": \"From Head to Toe动物动作视频\",\n     \"resource_cover\": \"http://p.qpic.cn/videoyun/0/200005241_2b4bf940312c11e6bc1539c6771a22c4_2/640\",\n     \"is_visible\": \"1\",\n     \"mvs_video_info\": {\n       \"video_play_url\": {\n         \"f0\": \"http://200005241.vod.myqcloud.com/200005241_2b4bf940312c11e6bc1539c6771a22c4.f0.mp4\",\n         \"f10\": \"http://200005241.vod.myqcloud.com/200005241_2b4bf940312c11e6bc1539c6771a22c4.f10.mp4\",\n         \"f20\": \"http://200005241.vod.myqcloud.com/200005241_2b4bf940312c11e6bc1539c6771a22c4.f20.mp4\",\n         \"f30\": \"http://200005241.vod.myqcloud.com/200005241_2b4bf940312c11e6bc1539c6771a22c4.f30.mp4\"\n       }\n     }\n   },\n   {\n     \"resource_id\": \"617\",\n     \"resource_name\": \"From Head to Toe动物动作视频\",\n     \"resource_cover\": \"http://p.qpic.cn/videoyun/0/200005241_2b4bf940312c11e6bc1539c6771a22c4_2/640\",\n     \"is_visible\": \"1\",\n     \"mvs_video_info\": {\n       \"video_play_url\": {\n         \"f0\": \"http://200005241.vod.myqcloud.com/200005241_2b4bf940312c11e6bc1539c6771a22c4.f0.mp4\",\n         \"f10\": \"http://200005241.vod.myqcloud.com/200005241_2b4bf940312c11e6bc1539c6771a22c4.f10.mp4\",\n         \"f20\": \"http://200005241.vod.myqcloud.com/200005241_2b4bf940312c11e6bc1539c6771a22c4.f20.mp4\",\n         \"f30\": \"http://200005241.vod.myqcloud.com/200005241_2b4bf940312c11e6bc1539c6771a22c4.f30.mp4\"\n       }\n     }\n   }\n ]\n}",
-          "type": "json"
-        }
-      ]
-    },
-    "error": {
-      "fields": {
-        "错误 4xx": [
-          {
-            "group": "4xx",
-            "optional": false,
-            "field": "ValidationError",
-            "description": ""
-          }
-        ]
-      },
-      "examples": [
-        {
-          "title": "ValidationError:",
-          "content": "HTTP/1.1 422 Unprocessable Entity\n{\n  \"code\": \"ValidationError\",\n  \"message\": \"未传递header参数X-HB-Client-Type\"\n}",
-          "type": "json"
-        },
-        {
-          "title": "ValidationError:",
-          "content": "HTTP/1.1 422 Unprocessable Entity\n{\n  \"code\": \"ValidationError\",\n  \"message\": \"输入字段验证出错，缺少字段或字段格式有误\"\n}",
-          "type": "json"
-        }
-      ]
-    },
-    "sampleRequest": [
-      {
-        "url": "https://api.baobaobooks.net/bookshelf/v1/books/4510/contents"
-      }
-    ],
-    "filename": "bookshelf/v1/bookshelf.php",
-    "groupTitle": "书架",
-    "groupDescription": "<p>书架模块相关接口</p>"
-  },
-  {
-    "type": "get",
-    "url": "/scan",
-    "title": "扫码成功后信息",
-    "version": "1.0.0",
-    "name": "get_scan",
-    "group": "bookshelf",
-    "permission": [
-      {
-        "name": "token",
-        "title": "需要用户登录",
-        "description": "<p>需要在header中传递Authorization，详情参考“使用前必读”-“公共参数”</p>"
-      }
-    ],
-    "description": "<p>该接口需要首先判断参数is_group的值，如果该书是合集，则根据goods_id调相关接口列出书籍列表；如果不是合集，则根据isbn_id调相关接口列出文章列表</p>",
-    "parameter": {
-      "fields": {
-        "Parameter": [
-          {
-            "group": "Parameter",
-            "type": "Integer",
-            "optional": true,
-            "field": "isbn",
-            "description": "<p>扫码成功后由客户端获取</p>"
-          },
-          {
-            "group": "Parameter",
-            "type": "Integer",
-            "optional": true,
-            "field": "channel_id",
-            "description": "<p>扫码成功后由客户端获取</p>"
-          }
-        ]
-      }
-    },
-    "success": {
-      "fields": {
-        "成功 200 OK": [
-          {
-            "group": "200",
-            "type": "Integer",
-            "optional": false,
-            "field": "book_exists",
-            "description": "<p>1-找到该书，0-未找到该书</p>"
-          },
-          {
-            "group": "200",
-            "type": "Array",
-            "optional": false,
-            "field": "items",
-            "description": "<p><strong>数据</strong></p>"
-          },
-          {
-            "group": "200",
-            "type": "Integer",
-            "optional": false,
-            "field": "goods_id",
-            "description": "<p>书的ID</p>"
-          },
-          {
-            "group": "200",
-            "type": "String",
-            "optional": false,
-            "field": "goods_name",
-            "description": "<p>书名</p>"
-          },
-          {
-            "group": "200",
-            "type": "String",
-            "optional": false,
-            "field": "bookshelf_img",
-            "description": "<p>书架图（书的封面图），尺寸320*X</p>"
-          },
-          {
-            "group": "200",
-            "type": "Integer",
-            "optional": false,
-            "field": "is_added",
-            "description": "<p>1-已添加至书架，0-未添加至书架</p>"
-          },
-          {
-            "group": "200",
-            "type": "Integer",
-            "optional": false,
-            "field": "is_group",
-            "description": "<p>1-是合集，0-不是合集</p>"
-          },
-          {
-            "group": "200",
-            "type": "Integer",
-            "optional": false,
-            "field": "isbn_id",
-            "description": "<p>ISBN的ID，是主键</p>"
-          },
-          {
-            "group": "200",
-            "type": "Array",
-            "optional": false,
-            "field": "books_list",
-            "description": "<p>合集书列表(<strong>扫isbn时才有</strong>)</p>"
-          },
-          {
-            "group": "200",
-            "type": "String",
-            "optional": false,
-            "field": "goods_img_thumb",
-            "description": "<p>书架图（书的封面图），尺寸320*X</p>"
-          },
-          {
-            "group": "200",
-            "type": "Integer",
-            "optional": false,
-            "field": "is_read",
-            "description": "<p>是否已读，1-已读，0-未读</p>"
-          }
-        ]
-      },
-      "examples": [
-        {
-          "title": "正确响应:",
-          "content": "HTTP/1.1 200 OK\n{\n  \"book_exists\": 1,\n  \"items\": [\n   {\n     \"goods_id\": \"846\",\n     \"goods_name\": \"## 原装进口 安东尼·布朗 Willy the Dreamer 梦想家威利【平装】有JY音频\",\n     \"bookshelf_img\": null,\n     \"is_added\": 0,\n     \"is_group\": \"0\",\n     \"isbn_id\": \"121\"\n   }\n  ]\n}",
-          "type": "json"
-        }
-      ]
-    },
-    "error": {
-      "fields": {
-        "错误 4xx": [
-          {
-            "group": "4xx",
-            "optional": false,
-            "field": "ValidationError",
-            "description": "<p>输入字段验证出错，缺少字段或字段格式有误（详见message）</p>"
-          },
-          {
-            "group": "4xx",
-            "optional": false,
-            "field": "InvalidToken",
-            "description": "<p>未登录或授权过期，请登录</p>"
-          }
-        ]
-      },
-      "examples": [
-        {
-          "title": "ValidationError:",
-          "content": "HTTP/1.1 422 Unprocessable Entity\n{\n  \"code\": \"ValidationError\",\n  \"message\": \"未传递header参数Authorization\"\n}",
-          "type": "json"
-        },
-        {
-          "title": "InvalidToken:",
-          "content": "HTTP/1.1 401 Unauthorized\n{\n  \"code\": \"InvalidToken\",\n  \"message\": \"未登录或授权过期，请登录\"\n}",
-          "type": "json"
-        }
-      ]
-    },
-    "sampleRequest": [
-      {
-        "url": "https://api.baobaobooks.net/bookshelf/v1/scan?isbn=9781406313574"
-      }
-    ],
-    "filename": "bookshelf/v1/bookshelf.php",
-    "groupTitle": "书架",
-    "groupDescription": "<p>书架模块相关接口</p>"
-  },
-  {
-    "type": "get",
-    "url": "/user/bookshelf",
-    "title": "我的书架",
-    "version": "1.0.0",
-    "name": "get_user_bookshelf",
-    "group": "bookshelf",
-    "permission": [
-      {
-        "name": "token",
-        "title": "需要用户登录",
-        "description": "<p>需要在header中传递Authorization，详情参考“使用前必读”-“公共参数”</p>"
-      }
-    ],
-    "description": "<p>该接口需要首先判断参数is_group的值，如果该书是合集，则根据goods_id调相关接口列出书籍列表；如果不是合集，则根据isbn_id调相关接口列出文章列表；<strong>如果返回数据中is_group和isbn_id同时为0，APP端点击的时候直接跳转到“暂无内容，敬请期待”界面</strong>；<strong>增加contents=true传参，用来获取有内容的书架</strong>；<strong>增加isaudio=true传参，用来获取有声资源；domain传参，该值为童书馆域名</strong></p>",
-    "parameter": {
-      "fields": {
-        "Parameter": [
-          {
-            "group": "Parameter",
-            "type": "Integer",
-            "optional": true,
-            "field": "page",
-            "description": "<p>第几页，初始传值可以为1或者不传</p>"
-          },
-          {
-            "group": "Parameter",
-            "type": "Integer",
-            "optional": true,
-            "field": "per_page",
-            "description": "<p>每页显示的条数，默认值15</p>"
-          },
-          {
-            "group": "Parameter",
-            "type": "String",
-            "optional": true,
-            "field": "contents",
-            "description": "<p>只看有内容，默认值false</p>"
-          },
-          {
-            "group": "Parameter",
-            "type": "String",
-            "optional": true,
-            "field": "isaudio",
-            "description": "<p>有声资源，默认值false</p>"
-          },
-          {
-            "group": "Parameter",
-            "type": "String",
-            "optional": true,
-            "field": "domain",
-            "description": "<p>童书馆域名，默认值空</p>"
-          }
-        ]
-      }
-    },
-    "success": {
-      "fields": {
-        "成功 200 OK": [
-          {
-            "group": "200",
-            "type": "Integer",
-            "optional": false,
-            "field": "total_count",
-            "description": "<p>总记录数</p>"
-          },
-          {
-            "group": "200",
-            "type": "Integer",
-            "optional": false,
-            "field": "total_pages",
-            "description": "<p>总页数</p>"
-          },
-          {
-            "group": "200",
-            "type": "Integer",
-            "optional": false,
-            "field": "next_page",
-            "description": "<p>下一页，<strong>当下一页的页数大于总页数时不再请求</strong></p>"
-          },
-          {
-            "group": "200",
-            "type": "Array",
-            "optional": false,
-            "field": "items",
-            "description": "<p><strong>数据</strong></p>"
-          },
-          {
-            "group": "200",
-            "type": "Integer",
-            "optional": false,
-            "field": "items.shelf_id",
-            "description": "<p>主键</p>"
-          },
-          {
-            "group": "200",
+            "group": "Success 200",
             "type": "Integer",
             "optional": false,
             "field": "items.user_id",
-            "description": "<p>用户ID</p>"
+            "description": ""
           },
           {
-            "group": "200",
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "items.user_name",
+            "description": "<p>用户名称</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "items.avatar",
+            "description": "<p>用户头像URL</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "items.signture",
+            "description": "<p>用户签名</p>"
+          },
+          {
+            "group": "Success 200",
             "type": "Integer",
             "optional": false,
-            "field": "items.goods_id",
-            "description": "<p>书的ID</p>"
-          },
-          {
-            "group": "200",
-            "type": "String",
-            "optional": false,
-            "field": "items.bookshelf_img",
-            "description": "<p>书架图（书的封面图），尺寸320*X</p>"
-          },
-          {
-            "group": "200",
-            "type": "String",
-            "optional": false,
-            "field": "items.goods_name",
-            "description": "<p>合集书名</p>"
-          },
-          {
-            "group": "200",
-            "type": "String",
-            "optional": false,
-            "field": "items.bookname",
-            "description": "<p>书籍名称</p>"
-          },
-          {
-            "group": "200",
-            "type": "String",
-            "optional": false,
-            "field": "items.created_at",
-            "description": "<p>创建时间</p>"
-          },
-          {
-            "group": "200",
-            "type": "Integer",
-            "optional": false,
-            "field": "items.is_read",
-            "description": "<p>1-已读，0-未读</p>"
-          },
-          {
-            "group": "200",
-            "type": "Integer",
-            "optional": false,
-            "field": "items.is_group",
-            "description": "<p>1-是合集，0-不是合集</p>"
-          },
-          {
-            "group": "200",
-            "type": "Integer",
-            "optional": false,
-            "field": "items.isbn_id",
-            "description": "<p>ISBN的ID，是主键</p>"
-          },
-          {
-            "group": "200",
-            "type": "String",
-            "optional": false,
-            "field": "items.audio_url",
-            "description": "<p>有声资源链接</p>"
-          },
-          {
-            "group": "200",
-            "type": "Object",
-            "optional": false,
-            "field": "items.books",
-            "description": "<p>书籍列表，合集时才有数据</p>"
-          },
-          {
-            "group": "200",
-            "type": "Integer",
-            "optional": false,
-            "field": "items.books.isbn_id",
-            "description": "<p>ISBN的ID，是主键</p>"
-          },
-          {
-            "group": "200",
-            "type": "String",
-            "optional": false,
-            "field": "items.books.bookname",
-            "description": "<p>书籍名称</p>"
-          },
-          {
-            "group": "200",
-            "type": "String",
-            "optional": false,
-            "field": "items.books.bookshelf_img",
-            "description": "<p>书架图（书的封面图），尺寸320*X</p>"
+            "field": "items.friend_status",
+            "description": "<p>关注状态，0双方都未关注对方；1当前用户关注了对方，对方没有关注当前用户；2当前用户没有关注对方，对方关注了当前用户；3双方互相关注。</p>"
           }
         ]
       },
       "examples": [
         {
-          "title": "正确响应:",
-          "content": "HTTP/1.1 200 OK\n{\n \"total_count\": \"132\",\n \"total_pages\": 9,\n \"next_page\": 2,\n \"items\": [\n{\n     \"shelf_id\": \"1473122\",\n     \"user_id\": \"36845\",\n     \"goods_id\": \"9720\",\n     \"created_at\": \"75天前\",\n     \"goods_name\": \"英国进口 最经典最全版鹅妈妈童谣合集 My Very First Mother Goose Pack【超大开本平装】\",\n     \"bookname\": \"英国进口 最经典最全版鹅妈妈童谣合集 My Very First Mother Goose Pack【超大开本平装】\",\n     \"bookshelf_img\": \"https://oss.baobaobooks.net/images/goods/covers/1452310705264582960.jpg?w=320&h=355\",\n     \"is_group\": 1,\n     \"isbn_id\": 0,\n     \"audio_url\": \"http://zl.baobaobooks.net/ayb/books/9720\",\n     \"books\": [\n       {\n         \"isbn_id\": \"4567\",\n         \"bookname\": \"My Very First Mother Goose\",\n         \"bookshelf_img\": \"https://oss.baobaobooks.net/images/goods/covers/1452310705264582960.jpg?w=320&h=355\"\n       },\n       {\n         \"isbn_id\": \"8420\",\n         \"bookname\": \"Here Comes Mother Goose\",\n         \"bookshelf_img\": \"https://oss.baobaobooks.net/images/goods/covers/1452281905315647760.jpg?w=320&h=349\"\n       }\n     ],\n     \"is_read\": 0\n   },\n   {\n     \"shelf_id\": \"1477715\",\n     \"user_id\": \"36845\",\n     \"goods_id\": \"8220\",\n     \"created_at\": \"35天前\",\n     \"goods_name\": \"英国进口 超级名家 安东尼·布朗作品 I Like Books【平装】\",\n     \"bookname\": \"## 英国进口 超级名家 安东尼·布朗作品 I Like Books【平装】\",\n     \"bookshelf_img\": \"https://oss.baobaobooks.net/images/201409/thumb_img/8220_thumb_G_1411553338227.jpg?w=320&h=320\",\n     \"is_group\": 0,\n     \"isbn_id\": \"3192\",\n     \"audio_url\": \"http://zl.baobaobooks.net/ayb/audio/3192/books\",\n     \"is_read\": 1\n   }\n ]\n}",
+          "title": "正确响应",
+          "content": "\t  HTTP/1.1 200 Ok\n  {\n\t\t\"next\": 4,\n\t\t\"items\": [\n\t\t\t{\n\t\t\t\t\"user_id\": 2343,\n\t\t\t\t\"username\": \"湖南\",\n\t\t\t\t\"avatar\": \"用户头像URL\",\n\t\t\t\t\"signture\": \"用户签名\",\n\t\t\t\t\"friend_status\": 1\n\t\t\t}\n\t\t]\n\t }",
           "type": "json"
         }
       ]
     },
+    "sampleRequest": [
+      {
+        "url": "https://api.baobaobooks.net/user/v1/following?page=1"
+      }
+    ],
+    "filename": "user/v1/following.php",
+    "groupTitle": "关注",
+    "groupDescription": "<p>我的关注和我的粉丝</p>",
     "error": {
       "fields": {
         "错误 4xx": [
           {
             "group": "4xx",
             "optional": false,
-            "field": "ValidationError",
-            "description": "<p>输入字段验证出错，缺少字段或字段格式有误（详见message）</p>"
+            "field": "InvalidToken",
+            "description": "<p>未登录或授权过期，请登录</p>"
           },
           {
             "group": "4xx",
             "optional": false,
-            "field": "InvalidToken",
-            "description": "<p>未登录或授权过期，请登录</p>"
+            "field": "NotFound",
+            "description": "<p>请求的资源不存在（详见message）</p>"
           }
         ]
       },
       "examples": [
         {
-          "title": "ValidationError:",
-          "content": "HTTP/1.1 422 Unprocessable Entity\n{\n  \"code\": \"ValidationError\",\n  \"message\": \"未传递header参数Authorization\"\n}",
-          "type": "json"
-        },
-        {
           "title": "InvalidToken:",
           "content": "HTTP/1.1 401 Unauthorized\n{\n  \"code\": \"InvalidToken\",\n  \"message\": \"未登录或授权过期，请登录\"\n}",
           "type": "json"
+        },
+        {
+          "title": "NotFound:",
+          "content": "HTTP/1.1 404 Not Found\n{\n  \"code\": \"NotFound\",\n  \"message\": \"请求的资源不存在\"\n}",
+          "type": "json"
         }
       ]
-    },
-    "filename": "bookshelf/v1/bookshelf.php",
-    "groupTitle": "书架",
-    "groupDescription": "<p>书架模块相关接口</p>"
+    }
   },
   {
-    "type": "get",
-    "url": "/user/bookshelf/recommended",
-    "title": "获取书架上的推荐书",
+    "type": "put",
+    "url": "/following/:user_id",
+    "title": "关注某人",
+    "name": "put_following__user_id",
+    "group": "following",
     "version": "1.0.0",
-    "name": "get_user_bookshelf_recommended",
-    "group": "bookshelf",
-    "permission": [
-      {
-        "name": "token",
-        "title": "需要用户登录",
-        "description": "<p>需要在header中传递Authorization，详情参考“使用前必读”-“公共参数”</p>"
-      }
-    ],
-    "description": "<p>获取书架上的推荐书，<strong>只推荐单本书</strong></p>",
-    "success": {
+    "description": "<p>关注某人</p>",
+    "parameter": {
       "fields": {
-        "成功 200 OK": [
+        "Parameter": [
           {
-            "group": "200",
-            "type": "Object",
-            "optional": false,
-            "field": "recommendation",
-            "description": "<p>推荐</p>"
-          },
-          {
-            "group": "200",
-            "type": "Integer",
-            "optional": false,
-            "field": "shelf_id",
-            "description": "<p>主键</p>"
-          },
-          {
-            "group": "200",
-            "type": "String",
-            "optional": false,
-            "field": "created_at",
-            "description": "<p>创建时间</p>"
-          },
-          {
-            "group": "200",
+            "group": "Parameter",
             "type": "Integer",
             "optional": false,
             "field": "user_id",
-            "description": "<p>用户ID</p>"
-          },
-          {
-            "group": "200",
-            "type": "Integer",
-            "optional": false,
-            "field": "goods_id",
-            "description": "<p>书的ID，值为零，代表没有可推荐的书籍</p>"
-          },
-          {
-            "group": "200",
-            "type": "String",
-            "optional": false,
-            "field": "bookshelf_img",
-            "description": "<p>书架图（书的封面图），尺寸320*X，值为空，代表没有可推荐的书籍</p>"
-          },
-          {
-            "group": "200",
-            "type": "String",
-            "optional": false,
-            "field": "goods_name",
-            "description": "<p>合集书名</p>"
-          },
-          {
-            "group": "200",
-            "type": "String",
-            "optional": false,
-            "field": "bookname",
-            "description": "<p>书籍名称</p>"
-          },
-          {
-            "group": "200",
-            "type": "Integer",
-            "optional": false,
-            "field": "is_read",
-            "description": "<p>1-已读，0-未读</p>"
-          },
-          {
-            "group": "200",
-            "type": "Integer",
-            "optional": false,
-            "field": "is_group",
-            "description": "<p>1-是合集，0-不是合集</p>"
-          },
-          {
-            "group": "200",
-            "type": "Integer",
-            "optional": false,
-            "field": "isbn_id",
-            "description": "<p>ISBN的ID，是主键</p>"
+            "description": "<p>用户id</p>"
           }
         ]
-      },
+      }
+    },
+    "success": {
       "examples": [
         {
-          "title": "正确响应:",
-          "content": "HTTP/1.1 200 OK\n{\n  \"recommendation\": {\n   \"shelf_id\": \"1471750\",\n   \"created_at\": \"\",\n   \"user_id\": 0,\n   \"goods_id\": \"5003\",\n   \"bookshelf_img\": \"https://oss.baobaobooks.net/images/201407/thumb_img/5003_thumb_G_1404268794716.jpg\",\n   \"goods_name\": \"\",\n   \"bookname\": \"1953年凯迪克银奖作品 The Storm Book 暴风雨 【平装】\",\n   \"is_read\": 0,\n   \"is_group\": 0,\n   \"isbn_id\": \"990\"\n  }\n}",
+          "title": "正确响应",
+          "content": "HTTP/1.1 204 No Content",
           "type": "json"
         }
       ]
     },
+    "filename": "user/v1/following.php",
+    "groupTitle": "关注",
+    "groupDescription": "<p>我的关注和我的粉丝</p>",
     "error": {
       "fields": {
         "错误 4xx": [
           {
             "group": "4xx",
             "optional": false,
-            "field": "ValidationError",
-            "description": "<p>输入字段验证出错，缺少字段或字段格式有误（详见message）</p>"
+            "field": "InvalidToken",
+            "description": "<p>未登录或授权过期，请登录</p>"
           },
           {
             "group": "4xx",
             "optional": false,
-            "field": "InvalidToken",
-            "description": "<p>未登录或授权过期，请登录</p>"
+            "field": "NotFound",
+            "description": "<p>请求的资源不存在（详见message）</p>"
           }
         ]
       },
       "examples": [
-        {
-          "title": "ValidationError:",
-          "content": "HTTP/1.1 422 Unprocessable Entity\n{\n  \"code\": \"ValidationError\",\n  \"message\": \"未传递header参数Authorization\"\n}",
-          "type": "json"
-        },
         {
           "title": "InvalidToken:",
           "content": "HTTP/1.1 401 Unauthorized\n{\n  \"code\": \"InvalidToken\",\n  \"message\": \"未登录或授权过期，请登录\"\n}",
           "type": "json"
-        }
-      ]
-    },
-    "filename": "bookshelf/v1/bookshelf.php",
-    "groupTitle": "书架",
-    "groupDescription": "<p>书架模块相关接口</p>"
-  },
-  {
-    "type": "get",
-    "url": "/user/bookshelf/suggestions",
-    "title": "有声资源下拉提示",
-    "version": "1.0.0",
-    "name": "get_user_bookshelf_suggestions",
-    "group": "bookshelf",
-    "permission": [
-      {
-        "name": "none",
-        "title": "无",
-        "description": "<p>开放接口，无需权限</p>"
-      }
-    ],
-    "description": "<p>有声资源搜索提示</p>",
-    "parameter": {
-      "fields": {
-        "Parameter": [
-          {
-            "group": "Parameter",
-            "type": "String",
-            "optional": false,
-            "field": "q",
-            "description": "<p>关键词(商品名称|作者名称)，需要urlencode</p>"
-          }
-        ]
-      }
-    },
-    "success": {
-      "fields": {
-        "成功 200 OK": [
-          {
-            "group": "200",
-            "type": "Array",
-            "optional": false,
-            "field": "items",
-            "description": "<p>返回的结果</p>"
-          }
-        ]
-      },
-      "examples": [
+        },
         {
-          "title": "正确响应:",
-          "content": "HTTP/1.1 200 OK\n{\n    \"items\":\n        [\n           \"美国进口i m sorry平装\",\n           \"英国进口i funny精装\",\n           \"原装进口big bears can大熊有一套精装\",\n           \"原装进口daisy系列tiger ways平装\",\n           \"原装进口fred小猫怕怕平装\",\n        ]\n}",
+          "title": "NotFound:",
+          "content": "HTTP/1.1 404 Not Found\n{\n  \"code\": \"NotFound\",\n  \"message\": \"请求的资源不存在\"\n}",
           "type": "json"
         }
       ]
-    },
-    "sampleRequest": [
-      {
-        "url": "https://api.baobaobooks.net/bookshelf/v1/user/bookshelf/suggestions"
-      }
-    ],
-    "filename": "bookshelf/v1/bookshelf.php",
-    "groupTitle": "书架",
-    "groupDescription": "<p>书架模块相关接口</p>"
+    }
   },
   {
     "type": "get",
-    "url": "/user/bookshelf/suggestions/audio",
-    "title": "有声资源下拉提示跳资源页",
+    "url": "/messages?status=*&offset=*&limit=*",
+    "title": "获取消息列表",
+    "name": "get_messages",
+    "group": "message",
     "version": "1.0.0",
-    "name": "get_user_bookshelf_suggestions_audio",
-    "group": "bookshelf",
-    "permission": [
-      {
-        "name": "none",
-        "title": "无",
-        "description": "<p>开放接口，无需权限</p>"
-      }
-    ],
-    "description": "<p>有声资源搜索提示</p>",
-    "parameter": {
-      "fields": {
-        "Parameter": [
-          {
-            "group": "Parameter",
-            "type": "String",
-            "optional": false,
-            "field": "q",
-            "description": "<p>关键词(商品名称|作者名称)，需要urlencode</p>"
-          }
-        ]
-      }
-    },
-    "success": {
-      "fields": {
-        "成功 200 OK": [
-          {
-            "group": "200",
-            "type": "Array",
-            "optional": false,
-            "field": "items",
-            "description": "<p>返回的结果</p>"
-          },
-          {
-            "group": "200",
-            "type": "String",
-            "optional": false,
-            "field": "items.goods_name",
-            "description": "<p>童书名称</p>"
-          },
-          {
-            "group": "200",
-            "type": "String",
-            "optional": false,
-            "field": "items.audio_url",
-            "description": "<p>录音资源链接</p>"
-          }
-        ]
-      },
-      "examples": [
-        {
-          "title": "正确响应:",
-          "content": "HTTP/1.1 200 OK\n{\n\"items\": [\n{\n\"goods_name\": \"美国加州 Evan-Moor 出品学生用书 技巧磨练科学系列 Skill Sharpeners: Science,Grade 1 【平装】（一年级）\",\n\"audio_url\": \"http://zl.baobaobooks.net/ayb/audio/8478/books\"\n},\n{\n\"goods_name\": \"美国进口 初级章节书 A to Z Mysteries 神秘案件 （全26册）【平装】\",\n\"audio_url\": \"http://zl.baobaobooks.net/ayb/books/9797\"\n}\n]\n}",
-          "type": "json"
-        }
-      ]
-    },
-    "sampleRequest": [
-      {
-        "url": "https://api.baobaobooks.net/bookshelf/v1/user/bookshelf/suggestions/audio"
-      }
-    ],
-    "filename": "bookshelf/v1/bookshelf.php",
-    "groupTitle": "书架",
-    "groupDescription": "<p>书架模块相关接口</p>"
-  },
-  {
-    "type": "get",
-    "url": "/user/bookshelf/search",
-    "title": "书架搜索",
-    "version": "1.0.0",
-    "name": "get_user_search_bookshelf",
-    "group": "bookshelf",
     "permission": [
       {
         "name": "token",
@@ -1477,215 +767,486 @@ define({ "api": [
         "description": "<p>需要在header中传递Authorization，详情参考“使用前必读”-“公共参数”</p>"
       }
     ],
-    "description": "<p>用书名进行搜索，<strong>增加contents=true传参，用来获取有内容的书架</strong>；<strong>增加isaudio=true传参，用来获取有声资源</strong></p>",
+    "description": "<p>获取消息列表</p>",
     "parameter": {
       "fields": {
         "Parameter": [
           {
             "group": "Parameter",
-            "type": "String",
+            "type": "Integer",
+            "optional": true,
+            "field": "status",
+            "defaultValue": "2",
+            "description": "<p>状态，0未读，1已读，2全部</p>"
+          },
+          {
+            "group": "Parameter",
+            "type": "Integer",
             "optional": false,
-            "field": "q",
-            "description": "<p>书名关键字</p>"
+            "field": "offset",
+            "defaultValue": "0",
+            "description": "<p>请求索引，默认0</p>"
           },
           {
             "group": "Parameter",
             "type": "Integer",
             "optional": true,
-            "field": "page",
-            "description": "<p>第几页，初始传值可以为1或者不传</p>"
-          },
-          {
-            "group": "Parameter",
-            "type": "Integer",
-            "optional": true,
-            "field": "per_page",
-            "description": "<p>每页显示的条数，默认值15</p>"
-          },
-          {
-            "group": "Parameter",
-            "type": "String",
-            "optional": true,
-            "field": "contents",
-            "description": "<p>只看有内容，默认值false</p>"
-          },
-          {
-            "group": "Parameter",
-            "type": "String",
-            "optional": true,
-            "field": "isaudio",
-            "description": "<p>有声资源，默认值false</p>"
-          },
-          {
-            "group": "Parameter",
-            "type": "String",
-            "optional": true,
-            "field": "domain",
-            "description": "<p>童书馆域名，默认值空</p>"
+            "field": "limit",
+            "defaultValue": "10",
+            "description": "<p>请求的条数，默认10</p>"
           }
         ]
       }
     },
     "success": {
       "fields": {
-        "成功 200 OK": [
+        "Success 200": [
           {
-            "group": "200",
+            "group": "Success 200",
             "type": "Integer",
             "optional": false,
-            "field": "total_count",
-            "description": "<p>总记录数</p>"
+            "field": "next",
+            "description": "<p>下一次请求的offset</p>"
           },
           {
-            "group": "200",
-            "type": "Integer",
-            "optional": false,
-            "field": "total_pages",
-            "description": "<p>总页数</p>"
-          },
-          {
-            "group": "200",
-            "type": "Integer",
-            "optional": false,
-            "field": "next_page",
-            "description": "<p>下一页，<strong>当下一页的页数大于总页数时不再请求</strong></p>"
-          },
-          {
-            "group": "200",
-            "type": "Array",
+            "group": "Success 200",
+            "type": "Object[]",
             "optional": false,
             "field": "items",
-            "description": "<p><strong>数据</strong></p>"
+            "description": "<p>消息数组</p>"
           },
           {
-            "group": "200",
+            "group": "Success 200",
             "type": "Integer",
             "optional": false,
-            "field": "items.shelf_id",
-            "description": "<p>主键</p>"
+            "field": "items.message_id",
+            "description": "<p>消息id</p>"
           },
           {
-            "group": "200",
-            "type": "Integer",
-            "optional": false,
-            "field": "items.user_id",
-            "description": "<p>用户ID</p>"
-          },
-          {
-            "group": "200",
-            "type": "Integer",
-            "optional": false,
-            "field": "items.goods_id",
-            "description": "<p>书的ID</p>"
-          },
-          {
-            "group": "200",
+            "group": "Success 200",
             "type": "String",
             "optional": false,
-            "field": "items.bookshelf_img",
-            "description": "<p>书架图（书的封面图），尺寸320*X</p>"
+            "field": "items.title",
+            "description": "<p>消息主题</p>"
           },
           {
-            "group": "200",
+            "group": "Success 200",
             "type": "String",
             "optional": false,
-            "field": "items.goods_name",
-            "description": "<p>书名</p>"
+            "field": "items.content",
+            "description": "<p>消息内容</p>"
           },
           {
-            "group": "200",
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "items.type",
+            "description": "<p>消息类型，通知类型：1-系统公告，2-订单信息，3-活动信息，4-评论信息，5-课程信息</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "items.type_id",
+            "description": "<p>消息类型对应的id，比如活动时为活动的id</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "items.status",
+            "description": "<p>状态，0未读，1已读</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": true,
+            "field": "items.link",
+            "description": "<p>web类型消息的详情页链接</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": true,
+            "field": "items.cover",
+            "description": "<p>消息的封面图，用于比如活动类消息时下发活动的海报图</p>"
+          },
+          {
+            "group": "Success 200",
             "type": "String",
             "optional": false,
-            "field": "items.created_at",
-            "description": "<p>创建时间</p>"
-          },
-          {
-            "group": "200",
-            "type": "Integer",
-            "optional": false,
-            "field": "items.is_read",
-            "description": "<p>1-已读，0-未读</p>"
-          },
-          {
-            "group": "200",
-            "type": "Integer",
-            "optional": false,
-            "field": "items.is_group",
-            "description": "<p>1-是合集，0-不是合集</p>"
-          },
-          {
-            "group": "200",
-            "type": "Integer",
-            "optional": false,
-            "field": "items.isbn_id",
-            "description": "<p>ISBN的ID，是主键</p>"
-          },
-          {
-            "group": "200",
-            "type": "String",
-            "optional": false,
-            "field": "items.audio_url",
-            "description": "<p>有声资源链接</p>"
+            "field": "items.create_at_format",
+            "description": "<p>消息发送时间格式化字符串</p>"
           }
         ]
       },
       "examples": [
         {
-          "title": "正确响应:",
-          "content": "HTTP/1.1 200 OK\n{\n \"total_count\": 0,\n  \"total_pages\": 1,\n  \"goods_exist\": true,\n  \"next_page\": 1,\n \"items\": [\n   {\n     \"shelf_id\": \"861768\",\n     \"user_id\": \"36845\",\n     \"goods_id\": \"9569\",\n     \"goods_name\": \"##美国进口 Richard Scarry's Cars and Trucks from A to Z 【纸板】\",\n     \"bookshelf_img\": \"https://oss.baobaobooks.net/images/201509/thumb_img/9569_thumb_G_1441229907810.jpg\",\n     \"is_read\": 0,\n     \"created_at\": \"153天前\",\n     \"is_group\": \"0\",\n     \"isbn_id\": \"4428\"\n   },\n   {\n     \"shelf_id\": \"861769\",\n     \"user_id\": \"36845\",\n     \"goods_id\": \"9610\",\n     \"goods_name\": \"## 美国进口 Who Stole the Cookies from the Cookie Jar? 【抽拉纸板】\",\n     \"bookshelf_img\": \"https://oss.baobaobooks.net/images/201509/thumb_img/9610_thumb_G_1442279985181.jpg\",\n     \"is_read\": 0,\n     \"created_at\": \"153天前\",\n     \"is_group\": \"0\",\n     \"isbn_id\": \"4466\"\n   }\n ]\n}",
+          "title": "正确响应",
+          "content": "HTTP/1.1 200 Ok\n{\n    \"next\":23,\n    \"items\":[{\n        \"message_id\":12,\n        \"title\":\"\",\n        \"content\":\"\",\n        \"type\":1,\n        \"type_id\":232,\n        \"status\":1,\n        \"link\":\"\",\n        \"cover\":\"\",\n        \"create_at_format\":\"1小时前\"\n    }]\n}",
           "type": "json"
         }
       ]
     },
+    "sampleRequest": [
+      {
+        "url": "https://api.baobaobooks.net/user/v1/messages?status=1&offset=0"
+      }
+    ],
+    "filename": "user/v1/message.php",
+    "groupTitle": "消息",
+    "groupDescription": "<p>我的消息相关</p>",
     "error": {
       "fields": {
         "错误 4xx": [
           {
             "group": "4xx",
             "optional": false,
-            "field": "ValidationError",
-            "description": "<p>输入字段验证出错，缺少字段或字段格式有误（详见message）</p>"
+            "field": "InvalidToken",
+            "description": "<p>未登录或授权过期，请登录</p>"
           },
           {
             "group": "4xx",
             "optional": false,
-            "field": "InvalidToken",
-            "description": "<p>未登录或授权过期，请登录</p>"
+            "field": "NotFound",
+            "description": "<p>请求的资源不存在（详见message）</p>"
           }
         ]
       },
       "examples": [
         {
-          "title": "ValidationError:",
-          "content": "HTTP/1.1 422 Unprocessable Entity\n{\n  \"code\": \"ValidationError\",\n  \"message\": \"未传递header参数Authorization\"\n}",
+          "title": "InvalidToken:",
+          "content": "HTTP/1.1 401 Unauthorized\n{\n  \"code\": \"InvalidToken\",\n  \"message\": \"未登录或授权过期，请登录\"\n}",
           "type": "json"
         },
         {
-          "title": "InvalidToken:",
-          "content": "HTTP/1.1 401 Unauthorized\n{\n  \"code\": \"InvalidToken\",\n  \"message\": \"未登录或授权过期，请登录\"\n}",
+          "title": "NotFound:",
+          "content": "HTTP/1.1 404 Not Found\n{\n  \"code\": \"NotFound\",\n  \"message\": \"请求的资源不存在\"\n}",
+          "type": "json"
+        }
+      ]
+    }
+  },
+  {
+    "type": "get",
+    "url": "/messages/unread/number",
+    "title": "获取未读消息数",
+    "name": "get_messages_unread_number",
+    "group": "message",
+    "version": "1.0.0",
+    "permission": [
+      {
+        "name": "token",
+        "title": "需要用户登录",
+        "description": "<p>需要在header中传递Authorization，详情参考“使用前必读”-“公共参数”</p>"
+      }
+    ],
+    "description": "<p>获取我的未读消息数</p>",
+    "success": {
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "number",
+            "description": "<p>未读消息数</p>"
+          }
+        ]
+      },
+      "examples": [
+        {
+          "title": "正确响应",
+          "content": "HTTP/1.1 200 Ok\n{\n    \"number\":122\n}",
           "type": "json"
         }
       ]
     },
-    "filename": "bookshelf/v1/bookshelf.php",
-    "groupTitle": "书架",
-    "groupDescription": "<p>书架模块相关接口</p>"
+    "sampleRequest": [
+      {
+        "url": "https://api.baobaobooks.net/user/v1/messages/unread/number"
+      }
+    ],
+    "filename": "user/v1/message.php",
+    "groupTitle": "消息",
+    "groupDescription": "<p>我的消息相关</p>",
+    "error": {
+      "fields": {
+        "错误 4xx": [
+          {
+            "group": "4xx",
+            "optional": false,
+            "field": "InvalidToken",
+            "description": "<p>未登录或授权过期，请登录</p>"
+          },
+          {
+            "group": "4xx",
+            "optional": false,
+            "field": "NotFound",
+            "description": "<p>请求的资源不存在（详见message）</p>"
+          }
+        ]
+      },
+      "examples": [
+        {
+          "title": "InvalidToken:",
+          "content": "HTTP/1.1 401 Unauthorized\n{\n  \"code\": \"InvalidToken\",\n  \"message\": \"未登录或授权过期，请登录\"\n}",
+          "type": "json"
+        },
+        {
+          "title": "NotFound:",
+          "content": "HTTP/1.1 404 Not Found\n{\n  \"code\": \"NotFound\",\n  \"message\": \"请求的资源不存在\"\n}",
+          "type": "json"
+        }
+      ]
+    }
+  },
+  {
+    "type": "put",
+    "url": "/messages",
+    "title": "设置全部消息已读",
+    "name": "put_messages",
+    "group": "message",
+    "version": "1.0.0",
+    "permission": [
+      {
+        "name": "token",
+        "title": "需要用户登录",
+        "description": "<p>需要在header中传递Authorization，详情参考“使用前必读”-“公共参数”</p>"
+      }
+    ],
+    "description": "<p>设置全部消息已读</p>",
+    "success": {
+      "examples": [
+        {
+          "title": "正确响应",
+          "content": "HTTP/1.1 204 No Content",
+          "type": "json"
+        }
+      ]
+    },
+    "filename": "user/v1/message.php",
+    "groupTitle": "消息",
+    "groupDescription": "<p>我的消息相关</p>",
+    "error": {
+      "fields": {
+        "错误 4xx": [
+          {
+            "group": "4xx",
+            "optional": false,
+            "field": "InvalidToken",
+            "description": "<p>未登录或授权过期，请登录</p>"
+          },
+          {
+            "group": "4xx",
+            "optional": false,
+            "field": "NotFound",
+            "description": "<p>请求的资源不存在（详见message）</p>"
+          }
+        ]
+      },
+      "examples": [
+        {
+          "title": "InvalidToken:",
+          "content": "HTTP/1.1 401 Unauthorized\n{\n  \"code\": \"InvalidToken\",\n  \"message\": \"未登录或授权过期，请登录\"\n}",
+          "type": "json"
+        },
+        {
+          "title": "NotFound:",
+          "content": "HTTP/1.1 404 Not Found\n{\n  \"code\": \"NotFound\",\n  \"message\": \"请求的资源不存在\"\n}",
+          "type": "json"
+        }
+      ]
+    }
+  },
+  {
+    "type": "delete",
+    "url": "/offlines/:offline_id",
+    "title": "删除离线",
+    "name": "delete_offlines__offline_id",
+    "group": "offline",
+    "version": "1.0.0",
+    "description": "<p>删除离线内容</p>",
+    "parameter": {
+      "fields": {
+        "Parameter": [
+          {
+            "group": "Parameter",
+            "type": "Integer",
+            "optional": false,
+            "field": "offline_id",
+            "description": "<p>离线对象id</p>"
+          }
+        ]
+      }
+    },
+    "success": {
+      "examples": [
+        {
+          "title": "正确响应",
+          "content": "HTTP/1.1 204 No Content",
+          "type": "json"
+        }
+      ]
+    },
+    "filename": "user/v1/offline.php",
+    "groupTitle": "离线",
+    "groupDescription": "<p>我的离线相关</p>",
+    "error": {
+      "fields": {
+        "错误 4xx": [
+          {
+            "group": "4xx",
+            "optional": false,
+            "field": "InvalidToken",
+            "description": "<p>未登录或授权过期，请登录</p>"
+          },
+          {
+            "group": "4xx",
+            "optional": false,
+            "field": "NotFound",
+            "description": "<p>请求的资源不存在（详见message）</p>"
+          }
+        ]
+      },
+      "examples": [
+        {
+          "title": "InvalidToken:",
+          "content": "HTTP/1.1 401 Unauthorized\n{\n  \"code\": \"InvalidToken\",\n  \"message\": \"未登录或授权过期，请登录\"\n}",
+          "type": "json"
+        },
+        {
+          "title": "NotFound:",
+          "content": "HTTP/1.1 404 Not Found\n{\n  \"code\": \"NotFound\",\n  \"message\": \"请求的资源不存在\"\n}",
+          "type": "json"
+        }
+      ]
+    }
+  },
+  {
+    "type": "get",
+    "url": "/offlines",
+    "title": "同步离线列表",
+    "name": "get_offlines",
+    "group": "offline",
+    "version": "1.0.0",
+    "description": "<p>同步离线列表</p>",
+    "success": {
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "offline_id",
+            "description": "<p>离线对象id</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "offline_type",
+            "description": "<p>类型，2代表视频，3代表音频</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "source_form",
+            "description": "<p>来源，1内容content，2课程course，3图书goods</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "source_url",
+            "description": "<p>资源的可下载URL</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "source_id",
+            "description": "<p>来源的id，比如内容时为content_id</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "source_name",
+            "description": "<p>来源名称，比如内容时为发表内容的用户名，来源课程时为资源名称</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "source_cover",
+            "description": "<p>来源的cover，比如来源内容时则为发表内容的用户的头像</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "audio_lrc_url",
+            "description": "<p>音频资源时，对应歌词的URL</p>"
+          }
+        ]
+      },
+      "examples": [
+        {
+          "title": "正确响应",
+          "content": "HTTP/1.1 200 Ok\n[{\n    \"offline_id\":12,\n    \"offline_type\":2,\n    \"source_id\":12,\n    \"source_form\":1,\n    \"source_url\":\"\",\n    \"source_name\":\"\",\n    \"source_cover\":\"\",\n    \"audio_lrc_url\":\"\"\n}]",
+          "type": "json"
+        }
+      ]
+    },
+    "sampleRequest": [
+      {
+        "url": "https://api.baobaobooks.net/user/v1/offlines"
+      }
+    ],
+    "filename": "user/v1/offline.php",
+    "groupTitle": "离线",
+    "groupDescription": "<p>我的离线相关</p>",
+    "error": {
+      "fields": {
+        "错误 4xx": [
+          {
+            "group": "4xx",
+            "optional": false,
+            "field": "InvalidToken",
+            "description": "<p>未登录或授权过期，请登录</p>"
+          },
+          {
+            "group": "4xx",
+            "optional": false,
+            "field": "NotFound",
+            "description": "<p>请求的资源不存在（详见message）</p>"
+          }
+        ]
+      },
+      "examples": [
+        {
+          "title": "InvalidToken:",
+          "content": "HTTP/1.1 401 Unauthorized\n{\n  \"code\": \"InvalidToken\",\n  \"message\": \"未登录或授权过期，请登录\"\n}",
+          "type": "json"
+        },
+        {
+          "title": "NotFound:",
+          "content": "HTTP/1.1 404 Not Found\n{\n  \"code\": \"NotFound\",\n  \"message\": \"请求的资源不存在\"\n}",
+          "type": "json"
+        }
+      ]
+    }
   },
   {
     "type": "post",
-    "url": "/user/bookshelf",
-    "title": "添加到书架",
+    "url": "/offlines",
+    "title": "新增离线",
+    "name": "post_offlines",
+    "group": "offline",
     "version": "1.0.0",
-    "name": "post_user_bookshelf",
-    "group": "bookshelf",
-    "permission": [
-      {
-        "name": "token",
-        "title": "需要用户登录",
-        "description": "<p>需要在header中传递Authorization，详情参考“使用前必读”-“公共参数”</p>"
-      }
-    ],
-    "description": "<p>添加到书架</p>",
+    "description": "<p>新增离线内容</p>",
     "parameter": {
       "fields": {
         "Parameter": [
@@ -1693,49 +1254,98 @@ define({ "api": [
             "group": "Parameter",
             "type": "Integer",
             "optional": false,
-            "field": "goods_id",
-            "description": "<p>书的ID</p>"
+            "field": "offline_type",
+            "description": "<p>类型，2代表视频，3代表音频</p>"
+          },
+          {
+            "group": "Parameter",
+            "type": "Integer",
+            "optional": false,
+            "field": "source_id",
+            "description": "<p>来源的id，比如内容时为content_id，课程时为cource_id，图书时为goods_id</p>"
+          },
+          {
+            "group": "Parameter",
+            "type": "Integer",
+            "optional": false,
+            "field": "source_form",
+            "description": "<p>来源，1内容content，2课程course，3图书goods</p>"
           }
         ]
       },
       "examples": [
         {
-          "title": "请求示例:",
-          "content": "{\n  \"goods_id\": 9677\n}",
+          "title": "请求示例",
+          "content": "{\n    \"offline_type\":1,\n    \"source_id\":9240,\n    \"source_form\":1\n}",
           "type": "json"
         }
       ]
     },
     "success": {
       "fields": {
-        "成功 201 Created": [
+        "Success 200": [
           {
-            "group": "201",
+            "group": "Success 200",
             "type": "Integer",
             "optional": false,
-            "field": "user_id",
-            "description": "<p>评论的ID，是主键</p>"
+            "field": "offline_id",
+            "description": "<p>离线对象id</p>"
           },
           {
-            "group": "201",
+            "group": "Success 200",
             "type": "Integer",
             "optional": false,
-            "field": "goods_id",
-            "description": "<p>评论的内容</p>"
+            "field": "offline_type",
+            "description": "<p>类型，2代表视频，3代表音频</p>"
           },
           {
-            "group": "201",
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "source_form",
+            "description": "<p>来源，1内容content，2课程course，3图书goods</p>"
+          },
+          {
+            "group": "Success 200",
             "type": "String",
             "optional": false,
-            "field": "created_at",
-            "description": "<p>创建时间</p>"
+            "field": "source_url",
+            "description": "<p>资源的可下载URL</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "source_id",
+            "description": "<p>来源的id，比如内容时为content_id，课程时为cource_id，图书时为goods_id</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "source_name",
+            "description": "<p>来源名称，比如内容时为发表内容的用户名，来源课程或图书时为资源名称</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "source_cover",
+            "description": "<p>来源的cover，比如来源内容时则为发表内容的用户的头像</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "audio_lrc_url",
+            "description": "<p>音频资源时，对应歌词的URL</p>"
           }
         ]
       },
       "examples": [
         {
-          "title": "正确响应:",
-          "content": "HTTP/1.1 201 Created\n{\n  \"user_id\": \"64253\",\n  \"goods_id\": 9677,\n  \"created_at\": \"1秒前\"\n}",
+          "title": "正确响应",
+          "content": "HTTP/1.1 201 Create\n{\n    \"offline_id\":12,\n    \"offline_type\":2,\n    \"source_id\":12,\n    \"source_form\":1,\n    \"source_url\":\"\",\n    \"source_name\":\"\",\n    \"source_cover\":\"\",\n    \"audio_lrc_url\":\"\"\n}",
           "type": "json"
         }
       ]
@@ -1770,8 +1380,315 @@ define({ "api": [
         }
       ]
     },
-    "filename": "bookshelf/v1/bookshelf.php",
-    "groupTitle": "书架",
-    "groupDescription": "<p>书架模块相关接口</p>"
+    "filename": "user/v1/offline.php",
+    "groupTitle": "离线",
+    "groupDescription": "<p>我的离线相关</p>"
+  },
+  {
+    "type": "get",
+    "url": "/app/config",
+    "title": "获取App配置",
+    "name": "get_app_config",
+    "group": "user",
+    "version": "1.0.0",
+    "permission": [
+      {
+        "name": "token",
+        "title": "需要用户登录",
+        "description": "<p>需要在header中传递Authorization，详情参考“使用前必读”-“公共参数”</p>"
+      }
+    ],
+    "description": "<p>获取App配置的相关配置，比如订单配置的范围URL</p>",
+    "success": {
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "about_haibao_url",
+            "description": "<p>关于孩宝的URL</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "order_url",
+            "description": "<p>童书馆订单页面的URL</p>"
+          }
+        ]
+      },
+      "examples": [
+        {
+          "title": "正确响应",
+          "content": "HTTP/1.1 200 Ok\n{\n    \"about_haibao_url\":\"\",\n    \"order_url\":\"\"\n}",
+          "type": "json"
+        }
+      ]
+    },
+    "sampleRequest": [
+      {
+        "url": "https://api.baobaobooks.net/user/v1/app/config"
+      }
+    ],
+    "filename": "user/v1/user.php",
+    "groupTitle": "用户信息相关",
+    "groupDescription": "<p>用户基础配置信息相关</p>",
+    "error": {
+      "fields": {
+        "错误 4xx": [
+          {
+            "group": "4xx",
+            "optional": false,
+            "field": "InvalidToken",
+            "description": "<p>未登录或授权过期，请登录</p>"
+          }
+        ]
+      },
+      "examples": [
+        {
+          "title": "InvalidToken:",
+          "content": "HTTP/1.1 401 Unauthorized\n{\n  \"code\": \"InvalidToken\",\n  \"message\": \"未登录或授权过期，请登录\"\n}",
+          "type": "json"
+        }
+      ]
+    }
+  },
+  {
+    "type": "get",
+    "url": "/users/:user_id",
+    "title": "获取其他用户信息",
+    "name": "get_users__user_id",
+    "group": "user",
+    "version": "1.0.0",
+    "description": "<p>获取其他用户信息，<strong>注意：获取当前用户信息接口在account模块</strong></p>",
+    "parameter": {
+      "fields": {
+        "Parameter": [
+          {
+            "group": "Parameter",
+            "type": "Integer",
+            "optional": false,
+            "field": "user_id",
+            "description": "<p>用户id</p>"
+          }
+        ]
+      }
+    },
+    "success": {
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "user_id",
+            "description": "<p>用户id</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "user_name",
+            "description": "<p>用户名</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "gender",
+            "description": "<p>用户性别，1男2女</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "avatar",
+            "description": "<p>用户头像URL</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "signture",
+            "description": "<p>用户签名</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "cover",
+            "description": "<p>用户海报图URL，用于设置个人主页头像背景</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "is_lecturer",
+            "description": "<p>是否讲师，0不是，1是</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "lecturer_desc",
+            "description": "<p>讲师简介</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "is_promoter",
+            "description": "<p>是否推广人，0不是，1是</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "promoter_desc",
+            "description": "<p>推广人简介</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "friend_status",
+            "description": "<p>关注状态，0双方都未关注对方；1当前用户关注了对方，对方没有关注当前用户；2当前用户没有关注对方，对方关注了当前用户；3双方互相关注。</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "following_count",
+            "description": "<p>关注数</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "followers_count",
+            "description": "<p>粉丝数</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "contents_count",
+            "description": "<p>发布的日记总数（公开的）</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Object",
+            "optional": false,
+            "field": "location",
+            "description": "<p>推广人圈子所在地址</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "location.province",
+            "description": "<p>定位获取所在省名称</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "location.city",
+            "description": "<p>定位获取所在市名称</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "location.district",
+            "description": "<p>定位获取所在区的名称</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "location.address",
+            "description": "<p>定位后除去省市区的地址说明</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "location.address_detail",
+            "description": "<p>楼号，门牌号等</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Object[]",
+            "optional": false,
+            "field": "babies",
+            "description": "<p>用户宝宝</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "babies.baby_id",
+            "description": "<p>宝宝id</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "babies.name",
+            "description": "<p>宝宝名称</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "babies.gender",
+            "description": "<p>宝宝性别，1男2女</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "babies.avatar",
+            "description": "<p>宝宝头像</p>"
+          }
+        ]
+      },
+      "examples": [
+        {
+          "title": "正确响应",
+          "content": "HTTP/1.1 200 Ok\n{\n    \"user_id\":312,\n    \"user_name\":\"\",\n    \"gender\":1,\n    \"avatar\":\"\",\n    \"signture\":\"\",\n    \"cover\":\"\",\n    \"is_lecturer\":0,\n    \"lecturer_desc\":\"\",\n    \"is_promoter\":0,\n    \"promoter_desc\":\"\",\n    \"friend_status\":0,\n    \"following_count\":12,\n    \"followers_count\":23,\n    \"contents_count\":123,\n    \"location\":{\n        \"province\":\"\",\n        \"city\":\"\",\n        \"district\":\"\",\n        \"address\":\"\",\n        \"address_detail\":\"\",\n    },\n    \"babies\":[{\n        \"baby_id\":12,\n        \"name\":\"\",\n        \"gender\":2,\n        \"avatar\":\"\"\n    }]\n}",
+          "type": "json"
+        }
+      ]
+    },
+    "sampleRequest": [
+      {
+        "url": "https://api.baobaobooks.net/user/v1/users/2212"
+      }
+    ],
+    "filename": "user/v1/user.php",
+    "groupTitle": "用户信息相关",
+    "groupDescription": "<p>用户基础配置信息相关</p>",
+    "error": {
+      "fields": {
+        "错误 4xx": [
+          {
+            "group": "4xx",
+            "optional": false,
+            "field": "NotFound",
+            "description": "<p>请求的资源不存在（详见message）</p>"
+          }
+        ]
+      },
+      "examples": [
+        {
+          "title": "NotFound:",
+          "content": "HTTP/1.1 404 Not Found\n{\n  \"code\": \"NotFound\",\n  \"message\": \"请求的资源不存在\"\n}",
+          "type": "json"
+        }
+      ]
+    }
   }
 ] });

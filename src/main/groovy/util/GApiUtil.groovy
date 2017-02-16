@@ -12,13 +12,14 @@ import global.Config
 
 //将网址转成String
 static String GET_API(String address) {
-    return new URL(address).openStream().text
+    return new URL(address).getText("UTF-8")
+//    return new URL(address).openStream().text
 }
 
 //将网址转成想要的String
 static String GET_API_JSON(String address) {
     def apiString = GET_API(address)
-    new File(Config.API_CACHE_FILE_NAME).write(apiString)
+//    new File(Config.API_CACHE_FILE_NAME).write(apiString)
     GET_API_JSON2Real(apiString)
 }
 
