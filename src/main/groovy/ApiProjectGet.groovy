@@ -15,9 +15,9 @@ import javax.lang.model.element.Modifier
 
 
 def static start(String address) {
-
+    println "开始网络请求。。。"
     def content = GApiUtil.GET_API(address)
-
+    println "网络请求结束，处理中。。。"
     def proInfo = new Gson().fromJson(GApiUtil.GET_API_JSON2Real(content), PrjBean.class)
 
     def xml = proInfo.header.content

@@ -24,6 +24,7 @@ import javax.lang.model.element.Modifier
 
 def static start(String address) {
     def realApiResponseJson
+    println "开始网络请求。。。"
     if (Config.FROM_NET) {
         //Api的地址
         realApiResponseJson = GApiUtil.GET_API_JSON(address)
@@ -34,7 +35,7 @@ def static start(String address) {
         //从离线缓存中获取
         realApiResponseJson = GApiUtil.GET_FILE2String()
     }
-
+    println "网络请求结束，处理中。。。"
 //--------------->>2.通过Gson转化成Api对象
     def apiList = GApiUtil.CONVERT_TO_LIST(realApiResponseJson)
 
@@ -62,7 +63,9 @@ def static start(String address) {
                 if (totalClass != null) {
                     //生成类
                     def MeAnno = ClassName.get('com.example.inter', 'ApiFactory')
-                    totalClass.addAnnotation(AnnotationSpec.builder(MeAnno).build())
+                    def name = "$Config.PACKAGE_NAME.TOTAL_PACKAGE"
+                    println "packageName==$name"
+                    totalClass.addAnnotation(AnnotationSpec.builder(MeAnno).addMember('packageName', '$S', name).build())
                     GPoetUtil.print2File(Config.FILE_PATH.SERVICE, Config.PACKAGE_NAME.SERVICE, totalClass.build())
                 }
                 tempOpGroup = op.group
@@ -80,7 +83,9 @@ def static start(String address) {
 
     //给TotalClass 添加自定义的注解
     def MeAnno = ClassName.get('com.example.inter.ApiFactory', 'ApiFactory')
-    totalClass.addAnnotation(AnnotationSpec.builder(MeAnno).addMember('packageName', '$S', Config.PACKAGE_NAME).build())
+    def name = "$Config.PACKAGE_NAME.TOTAL_PACKAGE"
+    println "packageName==$name"
+    totalClass.addAnnotation(AnnotationSpec.builder(MeAnno).addMember('packageName', '$S', name).build())
 
 //    GPoetUtil.print2Out(Config.PACKAGE_NAME.SERVICE, totalClass.build())
     //循环结束也需要创建
