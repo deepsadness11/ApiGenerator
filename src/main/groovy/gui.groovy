@@ -40,7 +40,7 @@ void show() {
     }
 
     def main = new getStarted()
-
+   
     swingBuilder.frame(title: "Api 自动生成模型",
             defaultCloseOperation: JFrame.EXIT_ON_CLOSE,
             size: [400, 300],

@@ -23,3 +23,7 @@ auto generator for some api
 
 1. 在Config文件中配置对应的 url路径及包名和保存路径
 2. 运行main方法
+
+## TODO
+1. param 和response分包
+2. 支持AutoValue

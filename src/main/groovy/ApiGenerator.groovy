@@ -66,6 +66,7 @@ def static start(String address) {
                     GPoetUtil.print2File(Config.FILE_PATH.SERVICE, Config.PACKAGE_NAME.SERVICE, totalClass.build())
                 }
                 tempOpGroup = op.group
+                Config.CURRENT_GROUP_NAME=tempOpGroup
                 String apiServiceName = "$tempOpGroup" + "ApiService"
 //            println apiServiceName
                 totalClass = TypeSpec.interfaceBuilder(apiServiceName.capitalize())
