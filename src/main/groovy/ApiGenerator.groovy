@@ -66,7 +66,7 @@ def static start(String address) {
                     GPoetUtil.print2File(Config.FILE_PATH.SERVICE, Config.PACKAGE_NAME.SERVICE, totalClass.build())
                 }
                 tempOpGroup = op.group
-                Config.CURRENT_GROUP_NAME=tempOpGroup
+                Config.CURRENT_GROUP_NAME = tempOpGroup
                 String apiServiceName = "$tempOpGroup" + "ApiService"
 //            println apiServiceName
                 totalClass = TypeSpec.interfaceBuilder(apiServiceName.capitalize())
@@ -80,7 +80,7 @@ def static start(String address) {
 
     //给TotalClass 添加自定义的注解
     def MeAnno = ClassName.get('com.example.inter.ApiFactory', 'ApiFactory')
-    totalClass.addAnnotation(AnnotationSpec.builder(MeAnno).build())
+    totalClass.addAnnotation(AnnotationSpec.builder(MeAnno).addMember('packageName', '$S', Config.PACKAGE_NAME).build())
 
 //    GPoetUtil.print2Out(Config.PACKAGE_NAME.SERVICE, totalClass.build())
     //循环结束也需要创建

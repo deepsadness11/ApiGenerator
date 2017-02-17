@@ -25,5 +25,5 @@ auto generator for some api
 2. 运行main方法
 
 ## TODO
-1. param 和response分包
+~~1. param 和response分包~~
 2. 支持AutoValue
